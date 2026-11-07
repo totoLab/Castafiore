@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, View, Pressable } from 'react-native'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 
 import { useTheme } from '~/contexts/theme'
 import settingStyles from '~/styles/settings'
@@ -21,7 +21,7 @@ const ButtonMenu = ({ title, onPress, icon, endText = "", isLast = false }) => {
 					aspectRatio: 1,
 					marginRight: 15,
 					backgroundColor: theme.primaryTouch,
-					borderRadius: 5,
+					borderRadius: size.radius.sm,
 					alignItems: 'center',
 					justifyContent: 'center',
 				}}>
@@ -58,4 +58,4 @@ const ButtonMenu = ({ title, onPress, icon, endText = "", isLast = false }) => {
 	)
 }
 
-export default ButtonMenu
+export default ButtonMenu

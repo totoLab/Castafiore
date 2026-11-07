@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, Modal, FlatList, StyleSheet, useWindowDimensions, Pressable, Platform } from 'react-native'
+import { Text, View, Modal, FlatList, StyleSheet, useWindowDimensions, Pressable, Platform, Animated, PanResponder } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 
@@ -23,6 +23,9 @@ import SlideBar from '~/components/button/SlideBar'
 import SlideControl from '~/components/button/SlideControl'
 import SongItem from '~/components/item/SongItem'
 import ConnectButton from '~/components/button/ConnectButton'
+import { isReducedMotion } from '~/utils/reducedMotion'
+import { HeaderGradient } from '~/components/PresHeader'
+import { useTranslation } from 'react-i18next'
 
 const preview = {
 	COVER: 0,
@@ -43,16 +46,16 @@ const CoverItem = ({ isPreview, song, setFullScreen, stars }) => {
 	}, [song.index])
 
 	const albumImage = React.useMemo(() => {
-		const size = Math.min(width, 500) - 50
+		const side = Math.min(width, 500) - 50
 		return {
-			maxWidth: size,
-			width: size,
-			maxHeight: size,
-			height: size,
-			minwidth: size,
-			minHeight: size,
+			maxWidth: side,
+			width: side,
+			maxHeight: side,
+			height: side,
+			minwidth: side,
+			minHeight: side,
 			aspectRatio: 1,
-			borderRadius: 10,
+			borderRadius: size.radius.lg,
 		}
 	}, [width])
 
@@ -97,6 +100,34 @@ const CoverItem = ({ isPreview, song, setFullScreen, stars }) => {
 	)
 	if (isPreview === preview.LYRICS) return (
 		<Lyric song={song} style={albumImage} />
+	)
+}
+
+// Cover / Queue / Lyrics switch, replaces the two toggle icons at the bottom.
+const PreviewTabs = ({ value, onChange }) => {
+	const { t } = useTranslation()
+	const theme = useTheme()
+	const tabs = [[preview.COVER, 'Cover'], [preview.QUEUE, 'Queue'], [preview.LYRICS, 'Lyrics']]
+
+	return (
+		<View style={{ flexDirection: 'row', backgroundColor: theme.secondaryBack, borderRadius: size.radius.circle, padding: 3 }}>
+			{tabs.map(([key, name]) => (
+				<Pressable
+					key={key}
+					accessibilityRole="tab"
+					accessibilityState={{ selected: value === key }}
+					onPress={() => onChange(key)}
+					style={{
+						paddingVertical: 6,
+						paddingHorizontal: 14,
+						borderRadius: size.radius.circle,
+						backgroundColor: value === key ? theme.tertiaryBack : 'transparent',
+					}}
+				>
+					<Text style={{ color: value === key ? theme.primaryText : theme.secondaryText, fontSize: size.text.small, fontWeight: 'bold' }}>{t(name)}</Text>
+				</Pressable>
+			))}
+		</View>
 	)
 }
 
@@ -145,7 +176,24 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 	const song = useSong()
 	const insets = useSafeAreaInsets()
 	const navigation = useNavigation()
+	const { t } = useTranslation()
+	const { height } = useWindowDimensions()
 	const [isPreview, setIsPreview] = React.useState(preview.COVER)
+	const dragY = React.useRef(new Animated.Value(0)).current
+	const previewRef = React.useRef(preview.COVER)
+	previewRef.current = isPreview
+
+	// Drag the player down to close it. Only on the cover tab so the queue can still scroll.
+	const pan = React.useRef(PanResponder.create({
+		onMoveShouldSetPanResponder: (_, g) => previewRef.current === preview.COVER && g.dy > 10 && g.dy > Math.abs(g.dx) * 2,
+		onPanResponderMove: (_, g) => dragY.setValue(Math.max(0, g.dy)),
+		onPanResponderRelease: (_, g) => {
+			if (g.dy > 120 || g.vy > 1) setFullScreen(false)
+			else if (isReducedMotion()) dragY.setValue(0)
+			else Animated.spring(dragY, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start()
+		},
+		onPanResponderTerminate: () => Animated.spring(dragY, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start(),
+	})).current
 	const [isOptArtists, setIsOptArtists] = React.useState(false)
 	const [isOpt, setIsOpt] = React.useState(false)
 
@@ -159,7 +207,9 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 			navigationBarTranslucent={Platform.OS === 'android' && parseInt(Platform.Version, 10) > 34 ? false : true}
 			onRequestClose={() => setFullScreen(false)}
 		>
-			<View style={[mainStyles.contentMainContainer(insets), styles.mainContainer(insets, theme)]}>
+			<View style={{ flex: 1, backgroundColor: theme.primaryBack }}>
+			<Animated.View {...pan.panHandlers} style={[mainStyles.contentMainContainer(insets), styles.mainContainer(insets, theme), { transform: [{ translateY: dragY }] }]}>
+				<HeaderGradient theme={theme} height={height} />
 				<View style={{ width: '100%', flexDirection: 'row' }}>
 					<OptionsPlayer
 						song={song.songInfo}
@@ -177,6 +227,10 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 						color={theme.primaryText}
 						onPress={() => setFullScreen(false)}
 					/>
+					<View style={{ justifyContent: 'center' }}>
+						<PreviewTabs value={isPreview} onChange={setIsPreview} />
+					</View>
+					<View style={{ flex: 1 }} />
 					<IconButton
 						style={{
 							paddingVertical: 20,
@@ -238,12 +292,13 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 							onPress={() => Player.previousSong(config, song, songDispatch)}
 						/>
 						<PlayButton
-							size={50}
-							color={theme.primaryText}
+							size={size.icon.large}
+							color={theme.primaryBack}
 							style={{
-								paddingHorizontal: 10,
-								minWidth: 63,
-								minHeight: 60,
+								width: 64,
+								height: 64,
+								borderRadius: size.radius.circle,
+								backgroundColor: theme.primaryText,
 								justifyContent: 'center',
 								alignItems: 'center',
 							}}
@@ -258,14 +313,8 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 					</View>
 					<View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
 						<IconButton
-							icon="comment-o"
-							size={17}
-							color={isPreview == preview.LYRICS ? theme.primaryTouch : theme.secondaryText}
-							style={{ paddingVertical: 10, paddingEnd: 10 }}
-							onPress={() => setIsPreview(isPreview == preview.LYRICS ? preview.COVER : preview.LYRICS)}
-						/>
-						<IconButton
 							icon="repeat"
+							label={t('Repeat')}
 							size={17}
 							color={song.actionEndOfSong == 'repeat' ? theme.primaryTouch : theme.secondaryText}
 							style={{ paddingVertical: 10, paddingHorizontal: 10 }}
@@ -280,20 +329,15 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 						/>
 						<IconButton
 							icon="random"
+							label={t('Shuffle')}
 							size={17}
 							color={song.actionEndOfSong == 'random' ? theme.primaryTouch : theme.secondaryText}
 							style={{ paddingVertical: 10, paddingHorizontal: 10 }}
 							onPress={() => Player.setRepeat(songDispatch, song.actionEndOfSong === 'random' ? 'next' : 'random')}
 						/>
-						<IconButton
-							icon="bars"
-							size={17}
-							color={isPreview == preview.QUEUE ? theme.primaryTouch : theme.secondaryText}
-							style={{ paddingVertical: 10, paddingStart: 10 }}
-							onPress={() => setIsPreview(isPreview == preview.QUEUE ? preview.COVER : preview.QUEUE)}
-						/>
 					</View>
 				</View>
+			</Animated.View>
 			</View>
 		</Modal>
 	)
@@ -319,4 +363,4 @@ const styles = StyleSheet.create({
 	},
 })
 
-export default FullScreenPlayer
+export default FullScreenPlayer

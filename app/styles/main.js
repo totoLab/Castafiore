@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native"
 import size from "~/styles/size"
+import { isReducedMotion } from "~/utils/reducedMotion"
 
 export default StyleSheet.create({
 	mainContainer: (theme) => ({
@@ -45,17 +46,19 @@ export default StyleSheet.create({
 		height: size.image.small,
 		width: size.image.small,
 		// marginStart: 10,
-		borderRadius: 4,
+		borderRadius: size.radius.sm,
 		backgroundColor: theme.secondaryBack,
 	}),
 	icon: {
 		width: size.image.small,
 		height: size.image.small,
-		borderRadius: 10,
+		borderRadius: size.radius.lg,
 		marginEnd: 10
 	},
+	// Press feedback: slight shrink plus dim. Dim only when reduced motion is on.
 	opacity: ({ pressed, enable = true }) => ({
-		opacity: (pressed && enable) ? 0.5 : 1,
+		opacity: (pressed && enable) ? 0.6 : 1,
+		transform: (pressed && enable && !isReducedMotion()) ? [{ scale: 0.97 }] : [],
 	}),
 	smallText: color => ({
 		color: color,
@@ -72,4 +75,4 @@ export default StyleSheet.create({
 		fontSize: size.text.large,
 		textAlign: 'left',
 	}),
-})
+})

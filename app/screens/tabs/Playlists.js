@@ -2,12 +2,13 @@ import React from 'react'
 import { ScrollView, Text, TextInput, View, StyleSheet, Pressable } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 
 import { useConfig } from '~/contexts/config'
 import { useCachedAndApi, getApi } from '~/utils/api'
 import { useSettings } from '~/contexts/settings'
 import { useTheme } from '~/contexts/theme'
+import EmptyState from '~/components/EmptyState'
 import RotateIconButton from '~/components/button/RotateIconButton'
 import IconButton from '~/components/button/IconButton'
 import mainStyles from '~/styles/main'
@@ -27,8 +28,10 @@ const Playlists = ({ navigation }) => {
 		setData(json?.starred2?.song)
 	}, [])
 
+	const [playlistsLoaded, setPlaylistsLoaded] = React.useState(false)
 	const [playlists, refreshPlaylists, setPlaylists] = useCachedAndApi([], 'getPlaylists', null, (json, setData) => {
 		setData([...(json?.playlists?.playlist || [])].sort(sortPlaylist))
+		setPlaylistsLoaded(true)
 	}, [])
 
 	React.useEffect(() => {
@@ -92,7 +95,7 @@ const Playlists = ({ navigation }) => {
 			>
 				<Icon name="heart" size={size.icon.small} color={theme.primaryTouch} style={{ marginEnd: 10 }} />
 				<Text style={[mainStyles.subTitle(theme), { flex: 1 }]}>{t('Favorited')}</Text>
-				<Text style={{ color: theme.secondaryText, fontWeight: 'bold', fontSize: 15 }}>
+				<Text style={{ color: theme.secondaryText, fontWeight: 'bold', fontSize: size.text.small }}>
 					{favorited?.length} <Icon name="chevron-right" size={15} color={theme.secondaryText} />
 				</Text>
 			</Pressable>
@@ -107,7 +110,7 @@ const Playlists = ({ navigation }) => {
 									height: 40,
 									borderColor: 'gray',
 									borderWidth: 1,
-									borderRadius: 6,
+									borderRadius: size.radius.md,
 									color: theme.primaryText,
 									flex: 1,
 									paddingHorizontal: 10,
@@ -138,6 +141,9 @@ const Playlists = ({ navigation }) => {
 				}
 			</View>
 			<VerticalPlaylist playlists={playlists} onRefresh={refreshPlaylists} />
+			{playlistsLoaded && playlists?.length === 0 ? (
+				<EmptyState icon="list" text={t('No playlists yet')} actionText={t('New playlist')} onAction={() => setNewPlaylist('')} />
+			) : null}
 		</ScrollView>
 	)
 }
@@ -152,4 +158,4 @@ const styles = StyleSheet.create({
 	},
 })
 
-export default Playlists
+export default Playlists

@@ -3,7 +3,7 @@ import { Text, View, ScrollView, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 import md5 from 'md5'
 
 import { getApi } from '~/utils/api'
@@ -56,8 +56,12 @@ const AddServer = ({ navigation }) => {
 			query = `u=${encodeURI(username)}&t=${md5(password + salt)}&s=${salt}&v=1.16.1&c=castafiore`
 		}
 
-		if (Platform.OS !== 'android' && uri.startsWith('http://')) {
-			setError('Only https is allowed')
+		// Browsers block http requests from an https page (mixed content). An app served
+		// over http, like a local or LAN build, can reach an http server. Android allows
+		// cleartext through usesCleartextTraffic.
+		const isHttpsPage = Platform.OS === 'web' && window.location.protocol === 'https:'
+		if (isHttpsPage && uri.startsWith('http://')) {
+			setError('This page is loaded over https, so the browser blocks http servers. Use an https address for the server, or open Castafiore over http.')
 			return
 		}
 		getApi({ url: uri, query }, 'ping.view')
@@ -94,7 +98,7 @@ const AddServer = ({ navigation }) => {
 							style={{
 								aspectRatio: 1,
 								backgroundColor: theme.primaryTouch,
-								borderRadius: 5,
+								borderRadius: size.radius.sm,
 								alignItems: 'center',
 								justifyContent: 'center',
 								padding: 10,
@@ -103,7 +107,7 @@ const AddServer = ({ navigation }) => {
 						</View>
 						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
 							{!error.length && <Icon name="circle" size={10} color={info ? 'green' : 'red'} />}
-							<Text style={{ color: error.length ? '#ff0000' : theme.primaryText, fontSize: size.text.medium, marginStart: 5 }}>
+							<Text style={{ color: error.length ? theme.danger : theme.primaryText, fontSize: size.text.medium, marginStart: 5 }}>
 								{(() => {
 									if (error.length) return error
 									else if (info) return `${info.type.charAt(0).toUpperCase()}${info.type.slice(1)} ${info.serverVersion}`

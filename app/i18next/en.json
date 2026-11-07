@@ -1,5 +1,37 @@
 {
   "translation": {
+    "songService": {
+      "Song service": "Song service",
+      "Access token": "Access token",
+      "Description": "Search shows songs from the full catalogue. Choosing one adds it to your server and plays it. Leave the address empty to turn this off.",
+      "Test connection": "Test connection",
+      "Not configured": "To find songs that are not on your server yet, add the song service address and access token in Settings > Song service.",
+      "Testing": "Testing connection…",
+      "Connected": "Connected to the song service.",
+      "Turned off": "Song service turned off.",
+      "Get more songs": "Get more songs",
+      "Catalogue unavailable": "The song catalogue is not responding, so only songs already known to the song service are shown.",
+      "No catalogue results": "No songs found in the catalogue. Try the artist and the song title.",
+      "Play title": "Play {{title}}",
+      "Get and play title": "Get and play {{title}}",
+      "Get album": "Get album",
+      "Play album": "Play album",
+      "Add album": "Add album",
+      "Add title": "Add {{title}} to your library",
+      "In your library": "In your library",
+      "Album songs": "{{cached}} of {{count}} songs in your library",
+      "Configured": "Configured",
+      "Not configured short": "Not configured",
+      "job": {
+        "queued": "Waiting in line",
+        "resolving": "Finding the best match",
+        "downloading": "Downloading audio",
+        "tagging": "Adding song details",
+        "scanning": "Adding to your library",
+        "done": "Ready",
+        "failed": "Could not add this song"
+      }
+    },
     "tabs": {
       "Home": "Home",
       "Search": "Search",
@@ -169,6 +201,10 @@
     "Public": "Public",
     "Queue": "Queue",
     "Random Song": "Random Song",
+    "Refresh": "Refresh",
+    "Browse all": "Browse all",
+    "Recent searches": "Recent searches",
+    "What do you want to listen to?": "What do you want to listen to?",
     "Remove from queue": "Remove from queue",
     "Remove radio": "Remove radio",
     "Reset Settings": "Reset Settings",

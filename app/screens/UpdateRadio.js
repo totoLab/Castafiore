@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 import { useTranslation } from 'react-i18next'
 
 import { useConfig } from '~/contexts/config'
@@ -63,7 +63,7 @@ const UpdateRadio = ({ navigation, route: { params } }) => {
 							style={{
 								aspectRatio: 1,
 								backgroundColor: theme.primaryTouch,
-								borderRadius: 5,
+								borderRadius: size.radius.sm,
 								alignItems: 'center',
 								justifyContent: 'center',
 								padding: 10,
@@ -72,7 +72,7 @@ const UpdateRadio = ({ navigation, route: { params } }) => {
 						</View>
 						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
 							{/* {!error.length && <Icon name="circle" size={10} color={info ? 'green' : 'red'} />} */}
-							<Text style={{ color: error.length ? '#ff0000' : theme.primaryText, fontSize: size.text.medium, marginStart: 5 }}>
+							<Text style={{ color: error.length ? theme.danger : theme.primaryText, fontSize: size.text.medium, marginStart: 5 }}>
 								{error || t('Enter radio details')}
 							</Text>
 						</View>
@@ -119,4 +119,4 @@ const UpdateRadio = ({ navigation, route: { params } }) => {
 	)
 }
 
-export default UpdateRadio
+export default UpdateRadio

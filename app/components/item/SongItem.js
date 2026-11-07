@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, View, StyleSheet, Pressable } from 'react-native'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 
 import { useConfig } from '~/contexts/config'
 import { isSongCached } from '~/utils/cache'
@@ -10,6 +10,7 @@ import { useSongDispatch } from '~/contexts/song'
 import { useTheme } from '~/contexts/theme'
 import { urlCover } from '~/utils/url'
 import FavoritedButton from '~/components/button/FavoritedButton'
+import IconButton from '~/components/button/IconButton'
 import ImageError from '~/components/ImageError'
 import mainStyles from '~/styles/main'
 import size from '~/styles/size'
@@ -45,7 +46,7 @@ const Cached = ({ song }) => {
 	return null
 }
 
-const SongItem = ({ song, queue, index, isIndex = false, isPlaying = false, setIndexOptions = () => { }, onPress = () => true, style = {} }) => {
+const SongItem = ({ song, queue, index, isIndex = false, isPlaying = false, setIndexOptions = null, onPress = () => true, style = {} }) => {
 	const songDispatch = useSongDispatch()
 	const theme = useTheme()
 	const config = useConfig()
@@ -61,10 +62,10 @@ const SongItem = ({ song, queue, index, isIndex = false, isPlaying = false, setI
 				if (onPress(song, queue, index)) playSong(config, songDispatch, queue, index)
 			}}
 			delayLongPress={200}
-			onLongPress={() => setIndexOptions(index)}
+			onLongPress={() => setIndexOptions?.(index)}
 			onContextMenu={(ev) => {
 				ev.preventDefault()
-				return setIndexOptions(index)
+				return setIndexOptions?.(index)
 			}}
 		>
 			<View style={[mainStyles.coverSmall(theme), { overflow: 'hidden', marginRight: 10 }]}>
@@ -75,7 +76,7 @@ const SongItem = ({ song, queue, index, isIndex = false, isPlaying = false, setI
 						justifyContent: 'center', alignItems: 'center'
 					}}
 					>
-						<Icon name="align-center" size={19} color={'white'} style={{ height: 19, transform: [{ rotate: '90deg' }] }} />
+						<Icon name="align-center" size={19} color={theme.onImage} style={{ height: 19, transform: [{ rotate: '90deg' }] }} />
 					</View>
 				)}
 				<ImageError
@@ -104,6 +105,15 @@ const SongItem = ({ song, queue, index, isIndex = false, isPlaying = false, setI
 				rating={song?.userRating ?? song?.rating ?? 0}
 				style={{ padding: 5, paddingStart: 10 }}
 			/>
+			{setIndexOptions ? (
+				<IconButton
+					icon="ellipsis-h"
+					size={size.icon.tiny}
+					color={theme.secondaryText}
+					style={{ padding: 5, paddingStart: 10 }}
+					onPress={() => setIndexOptions(index)}
+				/>
+			) : null}
 		</Pressable>
 	)
 }
@@ -114,7 +124,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		height: size.image.small,
 		marginBottom: 10,
-		borderRadius: 4,
+		borderRadius: size.radius.sm,
 	},
 })
 

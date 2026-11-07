@@ -1,7 +1,7 @@
 import React from 'react'
-import { Text, View, Pressable, StyleSheet } from 'react-native'
+import { Text, View, Pressable, StyleSheet, PanResponder } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 
 import { useSong, useSongDispatch } from '~/contexts/song'
 import { useConfig } from '~/contexts/config'
@@ -14,6 +14,21 @@ import ImageError from '~/components/ImageError'
 import size from '~/styles/size'
 import useKeyboardIsOpen from '~/utils/useKeyboardIsOpen'
 
+// Thin line along the bottom edge of the mini player. Own component so only it re-renders on each tick.
+const Progress = () => {
+	const song = useSong()
+	const theme = useTheme()
+	const time = Player.updateTime()
+	const duration = time.duration > 0 && time.duration !== Infinity ? time.duration : song?.songInfo?.duration
+	const ratio = duration ? Math.min(1, time.position / duration) : 0
+
+	return (
+		<View style={{ position: 'absolute', left: 10, right: 10, bottom: 0, height: 2, borderRadius: size.radius.sm, overflow: 'hidden' }}>
+			<View style={{ width: `${ratio * 100}%`, height: '100%', backgroundColor: theme.playerButton }} />
+		</View>
+	)
+}
+
 const BoxPlayer = ({ setFullScreen }) => {
 	const song = useSong()
 	const songDispatch = useSongDispatch()
@@ -21,9 +36,24 @@ const BoxPlayer = ({ setFullScreen }) => {
 	const insets = useSafeAreaInsets()
 	const theme = useTheme()
 	const isKeyboardOpen = useKeyboardIsOpen()
+	const latest = React.useRef({})
+	latest.current = { config, song, songDispatch, setFullScreen }
+
+	// Swipe up to open the full player, sideways to skip. A plain tap still opens it.
+	const pan = React.useRef(PanResponder.create({
+		onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 15 || g.dy < -15,
+		onPanResponderRelease: (_, g) => {
+			const { config, song, songDispatch, setFullScreen } = latest.current
+			if (Math.abs(g.dx) > Math.abs(g.dy)) {
+				if (g.dx < -60) Player.nextSong(config, song, songDispatch)
+				else if (g.dx > 60) Player.previousSong(config, song, songDispatch)
+			} else if (g.dy < -40) setFullScreen(true)
+		},
+	})).current
 
 	return (
 		<Pressable
+			{...pan.panHandlers}
 			onPress={() => setFullScreen(true)}
 			style={{
 				position: 'absolute',
@@ -36,7 +66,7 @@ const BoxPlayer = ({ setFullScreen }) => {
 				backgroundColor: theme.playerBackground,
 				padding: 10,
 				margin: 10,
-				borderRadius: 10,
+				borderRadius: size.radius.lg,
 				display: isKeyboardOpen ? 'none' : undefined,
 			}}>
 			<ImageError
@@ -55,14 +85,15 @@ const BoxPlayer = ({ setFullScreen }) => {
 				icon="step-forward"
 				size={size.icon.small}
 				color={theme.playerButton}
-				style={{ width: 35, alignItems: 'center' }}
+				style={{ width: 44, height: 44, alignItems: 'center' }}
 				onPress={() => Player.nextSong(config, song, songDispatch)}
 			/>
 			<PlayButton
 				size={size.icon.small}
 				color={theme.playerButton}
-				style={{ width: 35, alignItems: 'center' }}
+				style={{ width: 44, height: 44, alignItems: 'center' }}
 			/>
+			<Progress />
 		</Pressable>
 	)
 }
@@ -72,10 +103,10 @@ const styles = StyleSheet.create({
 		height: size.image.player,
 		width: size.image.player,
 		marginRight: 10,
-		borderRadius: 4,
+		borderRadius: size.radius.sm,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
 })
 
-export default BoxPlayer
+export default BoxPlayer

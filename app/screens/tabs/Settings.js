@@ -11,6 +11,7 @@ import { useSongDispatch } from '~/contexts/song'
 import { useTheme } from '~/contexts/theme'
 import ButtonMenu from '~/components/settings/ButtonMenu'
 import ButtonSwitch from '~/components/settings/ButtonSwitch'
+import { isServiceConfigured } from '~/utils/songService'
 import mainStyles from '~/styles/main'
 import Player from '~/utils/player'
 import settingStyles from '~/styles/settings'
@@ -58,6 +59,12 @@ const Settings = ({ navigation }) => {
 					endText={config.query ? (config.name?.length ? config.name : t('Connected')) : t('Not connected')}
 					icon="server"
 					onPress={() => navigation.navigate('Connect')}
+				/>
+				<ButtonMenu
+					title={t('songService.Song service')}
+					endText={isServiceConfigured(setting) ? t('songService.Configured') : t('songService.Not configured short')}
+					icon="cloud-download"
+					onPress={() => navigation.navigate('Settings/SongService')}
 					isLast
 				/>
 			</View>
@@ -148,7 +155,9 @@ const Settings = ({ navigation }) => {
 							'Are you sure you want to reset all settings?',
 							() => setSettings({
 								...defaultSettings,
-								servers: setting.servers
+								servers: setting.servers,
+								songServiceUrl: setting.songServiceUrl,
+								songServiceToken: setting.songServiceToken,
 							})
 						)
 					}}

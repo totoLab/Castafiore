@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text, Linking, StyleSheet, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 
 import { useConfig } from '~/contexts/config'
 import { getApi } from '~/utils/api'
@@ -198,14 +198,14 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
-		borderRadius: 7,
+		borderRadius: size.radius.md,
 	}),
 	image: {
 		height: '100%',
 		aspectRatio: 1,
 		marginRight: 10,
-		borderRadius: 3,
+		borderRadius: size.radius.sm,
 	},
 })
 
-export default RadioList
+export default RadioList

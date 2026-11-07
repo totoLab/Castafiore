@@ -3,7 +3,7 @@ import { Text, View, ScrollView, Pressable } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon from '~/components/Icon'
 
 import { useConfig, useSetConfig } from '~/contexts/config'
 import { confirmAlert } from '~/utils/alert'
@@ -62,7 +62,7 @@ const Connect = ({ navigation }) => {
 							style={{
 								aspectRatio: 1,
 								backgroundColor: theme.primaryTouch,
-								borderRadius: 5,
+								borderRadius: size.radius.sm,
 								alignItems: 'center',
 								justifyContent: 'center',
 								padding: 10,
@@ -71,7 +71,7 @@ const Connect = ({ navigation }) => {
 						</View>
 						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
 							{!error.length && <Icon name="circle" size={10} color={info ? 'green' : 'red'} />}
-							<Text style={{ color: error.length ? '#ff0000' : theme.primaryText, fontSize: size.text.medium, marginStart: 5 }}>
+							<Text style={{ color: error.length ? theme.danger : theme.primaryText, fontSize: size.text.medium, marginStart: 5 }}>
 								{(() => {
 									if (error.length) return error
 									else if (info) return `${info.type.charAt(0).toUpperCase()}${info.type.slice(1)} ${info.serverVersion}`
@@ -169,4 +169,4 @@ const Connect = ({ navigation }) => {
 	)
 }
 
-export default Connect
+export default Connect
