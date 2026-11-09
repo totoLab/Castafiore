@@ -13,6 +13,7 @@ export default {
 		large: 40,
 	},
 	text: {
+		tiny: 11,
 		caption: 12,
 		small: 14,
 		medium: 16,
@@ -27,6 +28,7 @@ export default {
 	},
 	icon: {
 		tiny: 20,
+		tab: 22,
 		small: 23,
 		medium: 25,
 		large: 30,

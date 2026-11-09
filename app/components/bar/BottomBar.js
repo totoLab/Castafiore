@@ -53,8 +53,8 @@ const TabItem = ({ route, index, state, descriptors, navigation }) => {
 			}])}
 			disabled={(!config.query && route.name !== 'Settings')}
 		>
-			<Icon name={options.icon} size={size.icon.tiny} color={color} style={{ alignSelf: 'center', marginBottom: 2, height: 24 }} />
-			<Text numberOfLines={1} style={{ color: color, textAlign: 'center', height: 16, fontSize: size.text.caption}}>
+			<Icon name={options.icon} size={size.icon.tab} color={color} style={{ alignSelf: 'center', marginBottom: 2, height: 24 }} />
+			<Text numberOfLines={1} style={{ color: color, textAlign: 'center', height: 16, fontSize: size.text.tiny }}>
 				{t(`tabs.${options.title}`)}
 			</Text>
 		</Pressable>
