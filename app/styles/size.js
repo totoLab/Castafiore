@@ -30,5 +30,6 @@ export default {
 		small: 23,
 		medium: 25,
 		large: 30,
+		header: 24,
 	}
 }
