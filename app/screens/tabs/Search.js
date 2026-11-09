@@ -87,7 +87,7 @@ const BrowseAll = () => {
 
 	return (
 		<>
-			<Text style={mainStyles.titleSection(theme)}>{t('Browse all')}</Text>
+			<Text style={[mainStyles.titleSection(theme), { fontSize: size.text.medium, fontWeight: '600', marginTop: 15, marginBottom: 5 }]}>{t('Browse all')}</Text>
 			<View style={styles.grid}>
 				{explorers.map((item, index) => (
 					<BrowseTile key={item.route} title={item.title} color={TILE_COLORS[index]} onPress={() => navigation.navigate(item.route)} />
@@ -95,6 +95,7 @@ const BrowseAll = () => {
 				{genres.map((genre, index) => (
 					<GenreTile key={genre.value} genre={genre} color={TILE_COLORS[(index + explorers.length) % TILE_COLORS.length]} />
 				))}
+				{(explorers.length + genres.length) % 2 === 1 && <View style={styles.tileFiller} />}
 			</View>
 		</>
 	)
@@ -117,7 +118,7 @@ const SearchResult = ({ state, query, results, history, setHistory, setQuery, ad
 			{
 				history.length === 0 ? null : (
 					<>
-						<Text style={[mainStyles.titleSection(theme), { fontSize: size.text.medium + 1, marginTop: 10, marginBottom: 3 }]}>{t('Recent searches')}</Text>
+						<Text style={[mainStyles.titleSection(theme), { fontSize: size.text.medium + 1, fontWeight: '600', marginTop: 23, marginBottom: 3 }]}>{t('Recent searches')}</Text>
 						{
 							history.map((item, index) => (
 								<HistoryItem key={index} itemHist={item} index={index} setQuery={setQuery} delItemHistory={delItemHistory} />
@@ -308,8 +309,8 @@ const Search = () => {
 			mainStyles.contentMainContainer(insets), {
 				paddingBottom: 0,
 			}]}>
-			<Text style={mainStyles.mainTitle(theme)}>{t('Search')}</Text>
-			<View style={[mainStyles.stdVerticalMargin, { marginBottom: 20, flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
+			<Text style={[mainStyles.mainTitle(theme), { fontSize: size.title.small, marginHorizontal: size.margin, marginTop: 26, marginBottom: 22 }]}>{t('Search')}</Text>
+			<View style={[mainStyles.stdVerticalMargin, { marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
 				<TextInput
 					style={{
 						flex: 1,
@@ -319,13 +320,13 @@ const Search = () => {
 						textAlign: 'left',
 						height: 46,
 						paddingHorizontal: 8,
-						paddingStart: 42,
-						borderRadius: size.radius.md,
+						paddingStart: 47,
+						borderRadius: 7,
 						backgroundColor: theme.primaryText,
 						outline: 'none',
 					}}
 					placeholder={t('What do you want to listen to?')}
-					placeholderTextColor={theme.tertiaryBack}
+					placeholderTextColor={theme.secondaryBack}
 					value={query}
 					autoCapitalize='none'
 					onChangeText={(query) => setQuery(query)}
@@ -339,7 +340,7 @@ const Search = () => {
 							<Text style={{ color: theme.primaryText, fontWeight: 'bold' }}>{t('Clear')}</Text>
 						</Pressable> : null
 				}
-				<Icon name="search" size={size.icon.small} color={theme.primaryBack} style={{ position: 'absolute', left: 0, paddingVertical: 12.5, paddingHorizontal: 10 }} />
+				<Icon name="search" size={21} color={theme.primaryBack} style={{ position: 'absolute', left: 0, paddingVertical: 12.5, paddingHorizontal: 15 }} />
 			</View>
 			<ScrollView vertical={true} style={{ flex: 1 }} contentContainerStyle={{ flexDirection: 'column', paddingBottom: 80, gap: 10 }}>
 				<SearchResult
@@ -374,6 +375,10 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 		padding: 16,
 	},
+	tileFiller: {
+		flexBasis: '45%',
+		flexGrow: 1,
+	},
 	tileText: {
 		color: '#ffffff',
 		fontSize: size.text.medium,
@@ -386,7 +391,7 @@ const styles = StyleSheet.create({
 		height: 67,
 		right: -16,
 		bottom: 4,
-		borderRadius: size.radius.md,
+		borderRadius: 2,
 		transform: [{ rotate: '20deg' }],
 	},
 })
