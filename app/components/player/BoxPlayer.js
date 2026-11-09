@@ -23,8 +23,8 @@ const Progress = () => {
 	const ratio = duration ? Math.min(1, time.position / duration) : 0
 
 	return (
-		<View style={{ position: 'absolute', left: 10, right: 10, bottom: 0, height: 2, borderRadius: size.radius.sm, overflow: 'hidden' }}>
-			<View style={{ width: `${ratio * 100}%`, height: '100%', backgroundColor: theme.playerButton }} />
+		<View style={{ position: 'absolute', left: 10, right: 10, bottom: 0, height: 3, borderRadius: size.radius.sm, overflow: 'hidden', backgroundColor: theme.tertiaryBack }}>
+			<View style={{ width: `${ratio * 100}%`, height: '100%', backgroundColor: theme.playerSecondaryText }} />
 		</View>
 	)
 }
@@ -64,8 +64,10 @@ const BoxPlayer = ({ setFullScreen }) => {
 				flexDirection: 'row',
 				alignItems: 'center',
 				backgroundColor: theme.playerBackground,
-				padding: 10,
-				margin: 10,
+				paddingHorizontal: 10,
+				paddingVertical: 7.5,
+				marginHorizontal: 8,
+				marginVertical: 10,
 				borderRadius: size.radius.lg,
 				display: isKeyboardOpen ? 'none' : undefined,
 			}}>
@@ -78,19 +80,19 @@ const BoxPlayer = ({ setFullScreen }) => {
 				</View>
 			</ImageError>
 			<View style={{ flex: 1 }}>
-				<Text style={{ color: theme.playerPrimaryText, textAlign: 'left', flex: 1, fontWeight: 'bold' }} numberOfLines={1}>{song?.songInfo?.track ? `${song?.songInfo?.track}. ` : null}{song?.songInfo?.title ? song.songInfo.title : 'Song title'}</Text>
-				<Text style={{ color: theme.playerSecondaryText, textAlign: 'left', flex: 1 }} numberOfLines={1}>{song?.songInfo?.artist ? song.songInfo.artist : 'Artist'}</Text>
+				<Text style={{ color: theme.playerPrimaryText, textAlign: 'left', flex: 1, fontSize: 13.5, fontWeight: '600' }} numberOfLines={1}>{song?.songInfo?.title ? song.songInfo.title : 'Song title'}</Text>
+				<Text style={{ color: theme.playerSecondaryText, textAlign: 'left', flex: 1, fontSize: size.text.caption, fontWeight: '500' }} numberOfLines={1}>{song?.songInfo?.artist ? song.songInfo.artist : 'Artist'}</Text>
 			</View>
 			<IconButton
 				icon="step-forward"
 				size={size.icon.small}
-				color={theme.playerButton}
+				color={theme.playerPrimaryText}
 				style={{ width: 44, height: 44, alignItems: 'center' }}
 				onPress={() => Player.nextSong(config, song, songDispatch)}
 			/>
 			<PlayButton
 				size={size.icon.small}
-				color={theme.playerButton}
+				color={theme.playerPrimaryText}
 				style={{ width: 44, height: 44, alignItems: 'center' }}
 			/>
 			<Progress />
@@ -103,7 +105,7 @@ const styles = StyleSheet.create({
 		height: size.image.player,
 		width: size.image.player,
 		marginRight: 10,
-		borderRadius: size.radius.sm,
+		borderRadius: 6,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},

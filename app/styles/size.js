@@ -2,7 +2,7 @@ export default {
 	margin: 17, // side margin of screen content
 	image: {
 		tiny: 40,
-		player: 40,
+		player: 38,
 		small: 50, // example: album cover in song list
 		medium: 100, // example: album cover in album list
 		artist: 105, // artist cover in horizontal lists
