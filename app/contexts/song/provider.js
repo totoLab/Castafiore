@@ -28,6 +28,18 @@ export const SongProvider = ({ children }) => {
 		}
 	}, [])
 
+	// In background the playback service only updates global.song, so resync the UI on return
+	const songRef = React.useRef(song)
+	songRef.current = song
+	React.useEffect(() => {
+		const subscription = AppState.addEventListener('change', (appState) => {
+			const g = global.song
+			if (appState !== 'active' || !g?.queue || g.index === songRef.current.index) return
+			dispatch({ type: 'setIndex', index: g.index })
+		})
+		return () => subscription.remove()
+	}, [])
+
 	return (
 		<SongDispatchContext.Provider value={dispatch}>
 			<SongContext.Provider value={song}>
