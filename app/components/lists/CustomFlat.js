@@ -6,7 +6,7 @@ import { useSettings } from '~/contexts/settings'
 import IconButton from '~/components/button/IconButton'
 import size from '~/styles/size'
 
-const CustomFlat = ({ data, renderItem, style = { width: '100%' }, contentContainerStyle = { paddingHorizontal: 20, columnGap: 10 }, widthItem = 0 }) => {
+const CustomFlat = ({ data, renderItem, style = { width: '100%' }, contentContainerStyle = { paddingHorizontal: size.margin, columnGap: 15 }, widthItem = 0 }) => {
 	const theme = useTheme()
 	const settings = useSettings()
 	const indexScroll = React.useRef(0)
@@ -21,14 +21,14 @@ const CustomFlat = ({ data, renderItem, style = { width: '100%' }, contentContai
 		if (Math.floor(indexScroll.current) + Math.floor(visibleItems.current) >= data.length) indexScroll.current = data.length - 1
 		else indexScroll.current = Math.floor(indexScroll.current) + Math.floor(visibleItems.current)
 		setVisibility()
-		refScroll.current.scrollToIndex({ index: indexScroll.current, animated: true, viewOffset: 20 })
+		refScroll.current.scrollToIndex({ index: indexScroll.current, animated: true, viewOffset: size.margin })
 	}
 
 	const goLeft = () => {
 		if (Math.floor(indexScroll.current) - Math.floor(visibleItems.current) <= 0) indexScroll.current = 0
 		else indexScroll.current = Math.floor(indexScroll.current) - Math.floor(visibleItems.current)
 		setVisibility()
-		refScroll.current.scrollToIndex({ index: indexScroll.current, animated: true, viewOffset: 20 })
+		refScroll.current.scrollToIndex({ index: indexScroll.current, animated: true, viewOffset: size.margin })
 	}
 
 	const setVisibility = () => {

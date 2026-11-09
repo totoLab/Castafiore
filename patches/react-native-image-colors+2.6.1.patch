@@ -1,0 +1,15 @@
+diff --git a/node_modules/react-native-image-colors/android/build.gradle b/node_modules/react-native-image-colors/android/build.gradle
+index de2c5c5..8e53864 100644
+--- a/node_modules/react-native-image-colors/android/build.gradle
++++ b/node_modules/react-native-image-colors/android/build.gradle
+@@ -71,6 +71,10 @@ android {
+     kotlinOptions {
+       jvmTarget = JavaVersion.VERSION_11.majorVersion
+     }
++  } else {
++    kotlinOptions {
++      jvmTarget = JavaVersion.VERSION_17.majorVersion
++    }
+   }
+ 
+   defaultConfig {

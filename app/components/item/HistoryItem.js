@@ -37,10 +37,10 @@ const HistoryItem = ({ itemHist, index, setQuery, delItemHistory }) => {
 
 	return (
 		<Pressable key={index} onPress={handlePress} style={({ pressed }) => ([mainStyles.opacity({ pressed }), {
-			marginHorizontal: 20,
+			marginHorizontal: size.margin,
 			flexDirection: 'row',
 			alignItems: 'center',
-			paddingVertical: typeof itemHist === 'object' ? 0 : 6,
+			paddingVertical: typeof itemHist === 'object' ? 3.5 : 6,
 		}])}>
 			{
 				typeof itemHist === 'object' ? (
@@ -48,16 +48,16 @@ const HistoryItem = ({ itemHist, index, setQuery, delItemHistory }) => {
 						<ImageError
 							source={{ uri: urlCover(config, itemHist, 100) }}
 							style={{
-								width: 45,
-								height: 45,
+								width: 47,
+								height: 47,
 								borderRadius: itemHist.mediaType === 'artist' ? size.radius.circle : 3,
-								marginEnd: 10,
+								marginEnd: 12,
 								backgroundColor: theme.secondaryBack,
 							}}
 						/>
 						<View style={{ flex: 1, flexDirection: 'column' }}>
-							<Text numberOfLines={1} style={[mainStyles.smallText(theme.primaryText), { marginBottom: 2 }]}>{itemHist.name || itemHist.title}</Text>
-							<Text numberOfLines={1} style={mainStyles.smallText(theme.secondaryText)}>{t(itemHist.mediaType)} · {itemHist.artist}</Text>
+							<Text numberOfLines={1} style={[mainStyles.smallText(theme.primaryText), { fontSize: 15, fontWeight: '500', marginBottom: 2 }]}>{itemHist.name || itemHist.title}</Text>
+							<Text numberOfLines={1} style={[mainStyles.smallText(theme.secondaryText), { fontSize: 13, fontWeight: '500' }]}>{t(itemHist.mediaType)} · {itemHist.artist}</Text>
 						</View>
 					</>
 				) : (

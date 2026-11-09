@@ -1,10 +1,12 @@
 export default {
+	margin: 17, // side margin of screen content
 	image: {
 		tiny: 40,
-		player: 40,
+		player: 38,
 		small: 50, // example: album cover in song list
 		medium: 100, // example: album cover in album list
-		large: 160, // example: album cover in album list
+		artist: 105, // artist cover in horizontal lists
+		large: 154, // example: album cover in album list
 	},
 	title: {
 		small: 25,
@@ -12,6 +14,7 @@ export default {
 		large: 40,
 	},
 	text: {
+		tiny: 11,
 		caption: 12,
 		small: 14,
 		medium: 16,
@@ -26,8 +29,10 @@ export default {
 	},
 	icon: {
 		tiny: 20,
+		tab: 22,
 		small: 23,
 		medium: 25,
 		large: 30,
+		header: 24,
 	}
 }

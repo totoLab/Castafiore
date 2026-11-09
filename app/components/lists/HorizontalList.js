@@ -120,13 +120,17 @@ const HorizontalList = ({ refresh, id, enable }) => {
 				<Text numberOfLines={1} style={[mainStyles.titleSection(theme), {
 					flex: 1,
 					marginEnd: 0,
+					fontSize: 24,
+					letterSpacing: -1.2,
+					marginTop: 15,
+					marginBottom: 8,
 				}]}>{t(`homeSection.${section.title}`)}</Text>
 				{
 					section.isShowAll && <Icon
 						name='angle-right'
 						color={theme.secondaryText}
 						size={size.icon.medium}
-						style={mainStyles.titleSection(theme)}
+						style={{ ...mainStyles.titleSection(theme), marginTop: 15, marginBottom: 8 }}
 					/>
 				}
 			</Pressable>

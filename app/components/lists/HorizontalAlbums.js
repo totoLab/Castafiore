@@ -45,7 +45,7 @@ const HorizontalAlbums = ({ albums, year = false, onPress = () => { } }) => {
 			<CustomFlat
 				data={albums}
 				renderItem={renderItem}
-				widthItem={size.image.large + 10}
+				widthItem={size.image.large + 15}
 			/>
 			<OptionsAlbums
 				albums={albums}
@@ -69,7 +69,9 @@ const styles = StyleSheet.create({
 	},
 	titleAlbum: (theme) => ({
 		color: theme.primaryText,
-		fontSize: size.text.small,
+		fontSize: 13.5,
+		fontWeight: '600',
+		letterSpacing: -0.405,
 		textAlign: 'left',
 		width: size.image.large,
 		marginBottom: 3,
@@ -77,7 +79,9 @@ const styles = StyleSheet.create({
 	}),
 	artist: theme => ({
 		color: theme.secondaryText,
-		fontSize: size.text.small,
+		fontSize: 11.5,
+		fontWeight: '500',
+		lineHeight: 17,
 		width: size.image.large,
 		textAlign: 'left',
 	}),

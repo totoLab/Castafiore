@@ -31,7 +31,7 @@ const RequestAlbumsList = ({ albums }) => {
 		<CustomFlat
 			data={albums}
 			renderItem={renderItem}
-			widthItem={size.image.large + 10}
+			widthItem={size.image.large + 15}
 		/>
 	)
 }

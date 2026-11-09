@@ -32,7 +32,7 @@ const HorizontalQueue = ({ current, queue }) => {
 			style={{
 				position: 'relative',
 				backgroundColor: isHovered ? theme.secondaryBack : 'transparent',
-				marginHorizontal: 20,
+				marginHorizontal: size.margin,
 				padding: settings.isDesktop ? 15 : undefined,
 				borderWidth: settings.isDesktop ? 1 : 0,
 				borderColor: settings.isDesktop ? theme.secondaryBack : 'transparent',

@@ -132,7 +132,7 @@ const RadioList = ({ radios }) => {
 				contentContainerStyle={{
 					height: 60 * 2 + 10,
 					width: 310 * (radios.length + radios.length % 2) / 2 + 30,
-					paddingHorizontal: 20,
+					paddingHorizontal: size.margin,
 					flexDirection: 'column',
 					flexWrap: 'wrap',
 					columnGap: 10,

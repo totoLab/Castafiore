@@ -27,7 +27,7 @@ const HorizontalGenres = ({ genres }) => {
 		<CustomFlat
 			data={genres}
 			renderItem={renderItem}
-			widthItem={size.image.large + 10}
+			widthItem={size.image.large + 15}
 		/>
 	)
 }
