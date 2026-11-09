@@ -5,7 +5,8 @@ export default {
 		player: 40,
 		small: 50, // example: album cover in song list
 		medium: 100, // example: album cover in album list
-		large: 160, // example: album cover in album list
+		artist: 105, // artist cover in horizontal lists
+		large: 154, // example: album cover in album list
 	},
 	title: {
 		small: 25,

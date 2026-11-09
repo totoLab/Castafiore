@@ -36,7 +36,7 @@ const HorizontalArtists = ({ artists, onPress = () => { } }) => {
 				source={{ uri: urlCover(config, item) }}
 				iconError='user'
 			/>
-			<Text numberOfLines={1} style={{ color: theme.primaryText, fontSize: size.text.medium, marginBottom: 2, width: 100, textAlign: 'center' }}>{item.name}</Text>
+			<Text numberOfLines={1} style={{ color: theme.primaryText, fontSize: 12, fontWeight: '600', letterSpacing: -0.36, marginBottom: 2, width: size.image.artist, textAlign: 'center' }}>{item.name}</Text>
 		</Pressable>
 	), [theme, config, onPress])
 
@@ -45,7 +45,7 @@ const HorizontalArtists = ({ artists, onPress = () => { } }) => {
 			<CustomFlat
 				data={artists}
 				renderItem={renderItem}
-				widthItem={size.image.medium + 10}
+				widthItem={size.image.artist + 15}
 			/>
 
 			<OptionsArtists
@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	artistCover: {
-		height: size.image.medium,
-		width: size.image.medium,
+		height: size.image.artist,
+		width: size.image.artist,
 		marginBottom: 10,
 		borderRadius: size.radius.circle,
 	},

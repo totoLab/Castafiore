@@ -6,7 +6,7 @@ import { useSettings } from '~/contexts/settings'
 import IconButton from '~/components/button/IconButton'
 import size from '~/styles/size'
 
-const CustomFlat = ({ data, renderItem, style = { width: '100%' }, contentContainerStyle = { paddingHorizontal: size.margin, columnGap: 10 }, widthItem = 0 }) => {
+const CustomFlat = ({ data, renderItem, style = { width: '100%' }, contentContainerStyle = { paddingHorizontal: size.margin, columnGap: 15 }, widthItem = 0 }) => {
 	const theme = useTheme()
 	const settings = useSettings()
 	const indexScroll = React.useRef(0)
