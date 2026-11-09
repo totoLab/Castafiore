@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		width: '100%',
 		maxWidth: length * 60,
-		paddingStart: 20,
+		paddingStart: size.margin,
 		paddingEnd: 20,
 		flexDirection: 'row',
 		columnGap: 10,

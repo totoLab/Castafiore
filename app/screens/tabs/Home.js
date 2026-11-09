@@ -76,7 +76,7 @@ const Home = () => {
 			style={mainStyles.mainContainer(theme)}
 			contentContainerStyle={mainStyles.contentMainContainer(insets)}
 		>
-				<View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginHorizontal: 20, marginTop: 12 }}>
+				<View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginHorizontal: size.margin, marginTop: 12 }}>
 					{
 						settings.listenBrainzUser ?
 							<IconButton
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		gap: 8,
-		marginHorizontal: 20,
+		marginHorizontal: size.margin,
 		marginTop: 16,
 	},
 	tile: theme => ({

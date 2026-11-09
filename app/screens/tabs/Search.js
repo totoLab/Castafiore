@@ -189,7 +189,7 @@ const CatalogResults = ({ catalog }) => {
 	const { t } = useTranslation()
 	const theme = useTheme()
 	const message = (text) => (
-		<Text style={{ marginHorizontal: 20, color: theme.secondaryText, fontSize: size.text.medium }}>{text}</Text>
+		<Text style={{ marginHorizontal: size.margin, color: theme.secondaryText, fontSize: size.text.medium }}>{text}</Text>
 	)
 
 	if (catalog.state === 'idle') return null
@@ -208,13 +208,13 @@ const CatalogResults = ({ catalog }) => {
 			{catalog.state === 'loaded' && catalog.items.length === 0 && catalog.albums.length === 0 && message(t('songService.No catalogue results'))}
 			{catalog.state === 'loaded' && catalog.albums.length > 0 && (
 				<>
-					<Text style={[mainStyles.smallText(theme.secondaryText), { marginHorizontal: 20 }]}>{t('Albums')}</Text>
+					<Text style={[mainStyles.smallText(theme.secondaryText), { marginHorizontal: size.margin }]}>{t('Albums')}</Text>
 					<RequestAlbumsList albums={catalog.albums} />
 				</>
 			)}
 			{catalog.state === 'loaded' && catalog.items.length > 0 && (
 				<>
-					<Text style={[mainStyles.smallText(theme.secondaryText), { marginHorizontal: 20 }]}>{t('Songs')}</Text>
+					<Text style={[mainStyles.smallText(theme.secondaryText), { marginHorizontal: size.margin }]}>{t('Songs')}</Text>
 					<RequestSongsList items={catalog.items} />
 				</>
 			)}
@@ -362,8 +362,9 @@ const styles = StyleSheet.create({
 	grid: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		gap: 13,
-		marginHorizontal: 20,
+		rowGap: 16,
+		columnGap: 13,
+		marginHorizontal: size.margin,
 	},
 	tile: {
 		flexBasis: '45%',

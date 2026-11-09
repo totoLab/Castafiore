@@ -117,7 +117,7 @@ const RequestSongsList = ({ items, isIndex = false, getAllRef = null }) => {
 	}
 
 	return (
-		<View style={{ flexDirection: 'column', paddingHorizontal: 20 }}>
+		<View style={{ flexDirection: 'column', paddingHorizontal: size.margin }}>
 			{items.map((item) => {
 				const job = jobs[item.id]
 				const inLibrary = item.cached || job?.state === 'done'

@@ -37,7 +37,7 @@ const HistoryItem = ({ itemHist, index, setQuery, delItemHistory }) => {
 
 	return (
 		<Pressable key={index} onPress={handlePress} style={({ pressed }) => ([mainStyles.opacity({ pressed }), {
-			marginHorizontal: 20,
+			marginHorizontal: size.margin,
 			flexDirection: 'row',
 			alignItems: 'center',
 			paddingVertical: typeof itemHist === 'object' ? 0 : 6,

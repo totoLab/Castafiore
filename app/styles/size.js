@@ -1,4 +1,5 @@
 export default {
+	margin: 17, // side margin of screen content
 	image: {
 		tiny: 40,
 		player: 40,
