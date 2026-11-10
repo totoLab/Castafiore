@@ -14,7 +14,9 @@ let lastScrobble = {
 let shouldPlay = false
 let pauseTimer = null
 
+// Android runs the service in a headless context without the UI dispatch, so only global.song is updated there
 const fakeSongDispatch = (action) => {
+	if (global.songDispatch) return global.songDispatch(action)
 	songReducer(global.song, action)
 }
 
