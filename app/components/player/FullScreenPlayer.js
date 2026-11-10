@@ -74,6 +74,7 @@ const CoverItem = ({ isPreview, song, setFullScreen, stars }) => {
 				contentContainerStyle={{ width: '100%' }}
 				ref={scroll}
 				data={song.queue}
+				extraData={song.index}
 				keyExtractor={(_, index) => index}
 				showsVerticalScrollIndicator={false}
 				onLayout={() => scroll.current.scrollToIndex({ index: song.index, animated: false, viewOffset: 0, viewPosition: 0.5 })}

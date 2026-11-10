@@ -34,8 +34,11 @@ export const SongProvider = ({ children }) => {
 	React.useEffect(() => {
 		const subscription = AppState.addEventListener('change', (appState) => {
 			const g = global.song
-			if (appState !== 'active' || !g?.queue || g.index === songRef.current.index) return
-			dispatch({ type: 'setIndex', index: g.index })
+			const current = songRef.current
+			if (appState !== 'active' || !g?.queue) return
+			if (g.queue === current.queue && g.index === current.index) return
+			// setIndex alone keeps the stale queue, so restore the whole state
+			dispatch({ type: 'restore', song: g, isSongLoad: current.isSongLoad })
 		})
 		return () => subscription.remove()
 	}, [])
