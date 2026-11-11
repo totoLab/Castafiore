@@ -3,7 +3,7 @@ name: Build iOS (unsigned ipa)
 on:
   workflow_dispatch:
   push:
-    branches: ["main", "ios-build"]
+    branches: ["main"]
 
 jobs:
   build:
