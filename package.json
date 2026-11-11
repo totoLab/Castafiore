@@ -5,13 +5,15 @@
   "homepage": ".",
   "scripts": {
     "export:android": "eas build --platform android --profile production --local",
+    "build:apk": "expo prebuild -p android && cd android && ./gradlew assembleRelease && echo APK: android/app/build/outputs/apk/release/app-release.apk",
     "export:google": "eas build --platform android --profile google --local",
     "export:dev": "cross-env IS_DEV=true eas build --platform android --profile development --local",
     "android": "expo start --android --dev-client",
     "web": "cross-env PLATFORM=web IS_DEV=true expo start --web",
     "export:web": "cross-env PLATFORM=web expo export -p web && workbox generateSW workbox-config.js",
     "eslint": "eslint app index.js App.js -c eslint.config.mjs",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@legendapp/list": "^1.1.4",
