@@ -224,7 +224,7 @@ const CatalogResults = ({ catalog }) => {
 	)
 }
 
-/** A shared Deezer or Spotify song link, opened through the song service. Tapping the song plays it. */
+/** A shared Deezer or Spotify link, opened through the song service. Tapping a song plays it; an album opens. */
 const LinkResult = ({ link }) => {
 	const { t } = useTranslation()
 	const theme = useTheme()
@@ -234,11 +234,12 @@ const LinkResult = ({ link }) => {
 
 	return (
 		<>
-			<Text style={[mainStyles.titleSection(theme), { fontSize: size.text.large, marginTop: 10, marginBottom: 3 }]}>{t('songService.Shared song')}</Text>
+			<Text style={[mainStyles.titleSection(theme), { fontSize: size.text.large, marginTop: 10, marginBottom: 3 }]}>{t(link.album ? 'songService.Shared album' : 'songService.Shared song')}</Text>
 			{link.state === 'unconfigured' && message(t('songService.Link needs service'))}
 			{link.state === 'loading' && <ActivityIndicator color={theme.primaryTouch} />}
 			{link.state === 'error' && message(link.error)}
-			{link.state === 'loaded' && <RequestSongsList items={[link.track]} />}
+			{link.state === 'loaded' && link.track && <RequestSongsList items={[link.track]} />}
+			{link.state === 'loaded' && link.album && <RequestAlbumsList albums={[link.album]} />}
 		</>
 	)
 }
@@ -309,7 +310,7 @@ const Search = () => {
 			})
 	}
 
-	// A pasted Deezer or Spotify link opens that song instead of searching for the link's text.
+	// A pasted Deezer or Spotify link opens that song or album instead of searching for the link's text.
 	const openLink = () => {
 		catalogRequest.current++
 		setCatalog({ state: 'idle', items: [] })
@@ -323,7 +324,7 @@ const Search = () => {
 		setLink({ state: 'loading' })
 		resolveLink(settings, query)
 			.then((json) => {
-				if (id === catalogRequest.current) setLink({ state: 'loaded', track: json.track })
+				if (id === catalogRequest.current) setLink({ state: 'loaded', track: json.track, album: json.album })
 			})
 			.catch((error) => {
 				if (id === catalogRequest.current) setLink({ state: 'error', error: error.message })

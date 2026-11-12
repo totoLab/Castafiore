@@ -13,7 +13,7 @@ import { useSong, useSongDispatch } from '~/contexts/song'
 import { urlCover } from '~/utils/url'
 import { shareText } from '~/utils/tools'
 import OptionsPopup from '~/components/popup/OptionsPopup'
-import useShareSongLinks from '~/utils/useShareSongLinks'
+import useShareLinks from '~/utils/useShareLinks'
 import size from '~/styles/size'
 
 const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () => { }, idPlaylist = null }) => {
@@ -25,7 +25,7 @@ const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () 
 	const settings = useSettings()
 	const refOption = React.useRef()
 	const [isCached, setIsCached] = React.useState(false)
-	const songLinks = useShareSongLinks(refOption)
+	const songLinks = useShareLinks(refOption)
 
 	React.useEffect(() => {
 		if (indexOptions < 0) return
@@ -238,7 +238,7 @@ const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () 
 				{
 					name: t('songService.Share song links'),
 					icon: 'share',
-					onPress: () => songLinks.share(songs[indexOptions]),
+					onPress: () => songLinks.shareSong(songs[indexOptions]),
 					hidden: !songLinks.available
 				},
 				{

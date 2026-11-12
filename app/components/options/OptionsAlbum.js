@@ -10,6 +10,7 @@ import { playSong, downloadSong, addToQueue } from '~/utils/player'
 import { useSong, useSongDispatch } from '~/contexts/song'
 import { useSettings } from '~/contexts/settings'
 import OptionsPopup from '~/components/popup/OptionsPopup'
+import useShareLinks from '~/utils/useShareLinks'
 
 const OptionsAlbum = ({ album, isOpen, onClose }) => {
 	const { t } = useTranslation()
@@ -19,6 +20,7 @@ const OptionsAlbum = ({ album, isOpen, onClose }) => {
 	const settings = useSettings()
 	const songDispatch = useSongDispatch()
 	const song = useSong()
+	const shareLinks = useShareLinks(refOption)
 
 	const playSimilarSongs = () => {
 		getApiNetworkFirst(config, 'getSimilarSongs', { id: album.id, count: 50 })
@@ -35,6 +37,7 @@ const OptionsAlbum = ({ album, isOpen, onClose }) => {
 			ref={refOption}
 			visible={isOpen}
 			close={() => {
+				shareLinks.cancel()
 				onClose()
 				refOption.current.clearVirtualOptions()
 			}}
@@ -104,6 +107,12 @@ const OptionsAlbum = ({ album, isOpen, onClose }) => {
 							.catch(() => { })
 						refOption.current.close()
 					}
+				},
+				{
+					name: t('songService.Share album links'),
+					icon: 'share',
+					onPress: () => shareLinks.shareAlbum(album),
+					hidden: !shareLinks.available
 				},
 				{
 					name: t('Info'),

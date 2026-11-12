@@ -10,7 +10,7 @@ import { useSettings, useSetSettings } from '~/contexts/settings'
 import { useSongDispatch } from '~/contexts/song'
 import OptionsPopup from '~/components/popup/OptionsPopup'
 import Player from '~/utils/player'
-import useShareSongLinks from '~/utils/useShareSongLinks'
+import useShareLinks from '~/utils/useShareLinks'
 import size from '~/styles/size'
 
 const OptionsPlayer = ({ song, isOpen, setIsOpen, closePlayer }) => {
@@ -21,7 +21,7 @@ const OptionsPlayer = ({ song, isOpen, setIsOpen, closePlayer }) => {
 	const config = useConfig()
 	const songDispatch = useSongDispatch()
 	const refOption = React.useRef()
-	const songLinks = useShareSongLinks(refOption)
+	const songLinks = useShareLinks(refOption)
 
 	const goToArtist = () => {
 		if (song.artists?.length > 1) {
@@ -114,7 +114,7 @@ const OptionsPlayer = ({ song, isOpen, setIsOpen, closePlayer }) => {
 				{
 					name: t('songService.Share song links'),
 					icon: 'share',
-					onPress: () => songLinks.share(song),
+					onPress: () => songLinks.shareSong(song),
 					hidden: song.isLiveStream || !songLinks.available
 				},
 				{

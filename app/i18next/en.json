@@ -26,6 +26,10 @@
       "No links found": "This song was not found on Deezer or Spotify.",
       "Links copied": "Links copied. Paste them in a message.",
       "Shared song": "Shared song",
+      "Shared album": "Shared album",
+      "Share album links": "Share Deezer and Spotify links",
+      "Finding album links": "Finding this album on Deezer and Spotify…",
+      "No album links found": "This album was not found on Deezer or Spotify.",
       "Link needs service": "To open Deezer and Spotify links, add the song service address in Settings > Song service.",
       "job": {
         "queued": "Waiting in line",

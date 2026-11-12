@@ -1,11 +1,12 @@
 import React from 'react'
-import { Platform, Share } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 
 import { getApi } from '~/utils/api'
 import { useConfig } from '~/contexts/config'
 import OptionsPopup from '~/components/popup/OptionsPopup'
+import { shareText } from '~/utils/tools'
+import useShareLinks from '~/utils/useShareLinks'
 import { playSong, addToQueue } from '~/utils/player'
 import { useSong, useSongDispatch } from '~/contexts/song'
 import { getApiNetworkFirst, getApiCacheFirst } from '~/utils/api'
@@ -17,6 +18,7 @@ const OptionsAlbums = ({ albums, indexOptions, setIndexOptions }) => {
 	const config = useConfig()
 	const refOption = React.useRef()
 	const songDispatch = useSongDispatch()
+	const shareLinks = useShareLinks(refOption)
 
 	const playSimilarSongs = () => {
 		getApiNetworkFirst(config, 'getSimilarSongs', { id: albums[indexOptions].id, count: 50 })
@@ -31,7 +33,11 @@ const OptionsAlbums = ({ albums, indexOptions, setIndexOptions }) => {
 		<OptionsPopup
 			ref={refOption}
 			visible={indexOptions >= 0}
-			close={() => { setIndexOptions(-1) }}
+			close={() => {
+				shareLinks.cancel()
+				refOption.current?.clearVirtualOptions()
+				setIndexOptions(-1)
+			}}
 			item={indexOptions >= 0 ? albums[indexOptions] : null}
 			options={[
 				{
@@ -70,14 +76,17 @@ const OptionsAlbums = ({ albums, indexOptions, setIndexOptions }) => {
 					onPress: () => {
 						getApi(config, 'createShare', { id: albums[indexOptions].id })
 							.then((json) => {
-								if (json.shares.share.length > 0) {
-									if (Platform.OS === 'web') navigator.clipboard.writeText(json.shares.share[0].url)
-									else Share.share({ message: json.shares.share[0].url })
-								}
+								if (json.shares.share.length > 0) shareText(json.shares.share[0].url)
 							})
 							.catch(() => { })
 						refOption.current.close()
 					}
+				},
+				{
+					name: t('songService.Share album links'),
+					icon: 'share',
+					onPress: () => shareLinks.shareAlbum(albums[indexOptions]),
+					hidden: !shareLinks.available
 				},
 				{
 					name: t('Info'),
