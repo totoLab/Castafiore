@@ -1,10 +1,10 @@
 import React from 'react'
-import { Platform, Share } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 
 import { useConfig } from '~/contexts/config'
 import { getApi, getApiNetworkFirst } from '~/utils/api'
+import { shareText } from '~/utils/tools'
 import { urlStream } from '~/utils/url'
 import { playSong, downloadSong, addToQueue } from '~/utils/player'
 import { useSong, useSongDispatch } from '~/contexts/song'
@@ -98,8 +98,7 @@ const OptionsAlbum = ({ album, isOpen, onClose }) => {
 						getApi(config, 'createShare', { id: album.id })
 							.then((json) => {
 								if (json.shares.share.length > 0) {
-									if (Platform.OS === 'web') navigator.clipboard.writeText(json.shares.share[0].url)
-									else Share.share({ message: json.shares.share[0].url })
+									shareText(json.shares.share[0].url)
 								}
 							})
 							.catch(() => { })

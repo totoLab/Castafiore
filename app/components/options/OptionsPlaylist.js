@@ -1,10 +1,10 @@
 import React from 'react'
-import { Platform, Share } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 
 import { useConfig } from '~/contexts/config'
 import { getApi } from '~/utils/api'
+import { shareText } from '~/utils/tools'
 import { urlStream } from '~/utils/url'
 import { downloadSong } from '~/utils/player'
 import { useSettings } from '~/contexts/settings'
@@ -65,8 +65,7 @@ const OptionsPlaylist = ({ playlist, open, onClose, onRefresh }) => {
 						getApi(config, 'createShare', { id: playlist.id })
 							.then((json) => {
 								if (json.shares.share.length > 0) {
-									if (Platform.OS === 'web') navigator.clipboard.writeText(json.shares.share[0].url)
-									else Share.share({ message: json.shares.share[0].url })
+									shareText(json.shares.share[0].url)
 								}
 							})
 							.catch(() => { })

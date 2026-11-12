@@ -1,3 +1,5 @@
+import { Platform, Share } from 'react-native'
+
 import { getApi } from '~/utils/api'
 
 export const shuffle = (array) => {
@@ -29,4 +31,16 @@ export const saveQueue = async (config, queue, index) => {
 		id: queue.map(item => item.id).join(','),
 		current: queue[index]?.id || '',
 	})
+}
+/**
+ * Share a text with the system share sheet, or copy it on web where there is none.
+ * Resolves with 'copied' on web, so the caller can say so.
+ */
+export const shareText = async (text) => {
+	if (Platform.OS === 'web') {
+		await navigator.clipboard.writeText(text)
+		return 'copied'
+	}
+	await Share.share({ message: text })
+	return 'shared'
 }
