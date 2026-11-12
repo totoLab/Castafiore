@@ -1,5 +1,5 @@
 import React from 'react'
-import { Linking } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 
@@ -13,7 +13,7 @@ import Player from '~/utils/player'
 import useShareLinks from '~/utils/useShareLinks'
 import size from '~/styles/size'
 
-const OptionsPlayer = ({ song, isOpen, setIsOpen, closePlayer }) => {
+const OptionsPlayer = ({ song, isOpen, setIsOpen, closePlayer, onShareLyrics }) => {
 	const { t } = useTranslation()
 	const settings = useSettings()
 	const setSettings = useSetSettings()
@@ -110,6 +110,16 @@ const OptionsPlayer = ({ song, isOpen, setIsOpen, closePlayer }) => {
 					icon: 'plus',
 					onPress: openAddToPlaylist,
 					hidden: song.isLiveStream
+				},
+				{
+					name: t('shareLyrics.Share lyrics'),
+					icon: 'quote',
+					onPress: () => {
+						refOption.current.close()
+						// On iOS a screen cannot open while the menu is closing.
+						setTimeout(onShareLyrics, Platform.OS === 'ios' ? 400 : 0)
+					},
+					hidden: song.isLiveStream || !onShareLyrics
 				},
 				{
 					name: t('songService.Share song links'),
