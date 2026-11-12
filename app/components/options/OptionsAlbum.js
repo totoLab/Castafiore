@@ -1,15 +1,16 @@
 import React from 'react'
-import { Platform, Share } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 
 import { useConfig } from '~/contexts/config'
 import { getApi, getApiNetworkFirst } from '~/utils/api'
+import { shareText } from '~/utils/tools'
 import { urlStream } from '~/utils/url'
 import { playSong, downloadSong, addToQueue } from '~/utils/player'
 import { useSong, useSongDispatch } from '~/contexts/song'
 import { useSettings } from '~/contexts/settings'
 import OptionsPopup from '~/components/popup/OptionsPopup'
+import useShareLinks from '~/utils/useShareLinks'
 
 const OptionsAlbum = ({ album, isOpen, onClose }) => {
 	const { t } = useTranslation()
@@ -19,6 +20,7 @@ const OptionsAlbum = ({ album, isOpen, onClose }) => {
 	const settings = useSettings()
 	const songDispatch = useSongDispatch()
 	const song = useSong()
+	const shareLinks = useShareLinks(refOption)
 
 	const playSimilarSongs = () => {
 		getApiNetworkFirst(config, 'getSimilarSongs', { id: album.id, count: 50 })
@@ -35,6 +37,7 @@ const OptionsAlbum = ({ album, isOpen, onClose }) => {
 			ref={refOption}
 			visible={isOpen}
 			close={() => {
+				shareLinks.cancel()
 				onClose()
 				refOption.current.clearVirtualOptions()
 			}}
@@ -98,13 +101,18 @@ const OptionsAlbum = ({ album, isOpen, onClose }) => {
 						getApi(config, 'createShare', { id: album.id })
 							.then((json) => {
 								if (json.shares.share.length > 0) {
-									if (Platform.OS === 'web') navigator.clipboard.writeText(json.shares.share[0].url)
-									else Share.share({ message: json.shares.share[0].url })
+									shareText(json.shares.share[0].url)
 								}
 							})
 							.catch(() => { })
 						refOption.current.close()
 					}
+				},
+				{
+					name: t('songService.Share album links'),
+					icon: 'share',
+					onPress: () => shareLinks.shareAlbum(album),
+					hidden: !shareLinks.available
 				},
 				{
 					name: t('Info'),

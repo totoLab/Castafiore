@@ -1,11 +1,11 @@
 import React from 'react'
-import { Platform, Share } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 
 import { useConfig } from '~/contexts/config'
 import { confirmAlert } from '~/utils/alert'
 import { getApi } from '~/utils/api'
+import { shareText } from '~/utils/tools'
 import OptionsPopup from '~/components/popup/OptionsPopup'
 
 const OptionsPlaylists = ({ playlists, indexOption, setIndexOption, deletePlaylists, setDeletePlaylists, onRefresh }) => {
@@ -119,8 +119,7 @@ const OptionsPlaylists = ({ playlists, indexOption, setIndexOption, deletePlayli
 						getApi(config, 'createShare', { id: playlists[indexOption].id })
 							.then((json) => {
 								if (json.shares.share.length > 0) {
-									if (Platform.OS === 'web') navigator.clipboard.writeText(json.shares.share[0].url)
-									else Share.share({ message: json.shares.share[0].url })
+									shareText(json.shares.share[0].url)
 								}
 							})
 							.catch(() => { })

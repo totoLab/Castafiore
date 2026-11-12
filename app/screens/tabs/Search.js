@@ -22,7 +22,7 @@ import EmptyState from '~/components/EmptyState'
 import SectionTitle from '~/components/SectionTitle'
 import RequestSongsList from '~/components/lists/RequestSongsList'
 import RequestAlbumsList from '~/components/lists/RequestAlbumsList'
-import { isServiceConfigured, searchCatalog } from '~/utils/songService'
+import { isServiceConfigured, looksLikeSongLink, resolveLink, searchCatalog } from '~/utils/songService'
 
 const STATES = {
 	INIT: 'init',
@@ -31,6 +31,7 @@ const STATES = {
 	LOADED: 'loaded',
 	API_ERROR: 'api_error',
 	NETWORK_ERROR: 'network_error',
+	LINK: 'link',
 }
 
 // Spotify-style "Browse all" tile colours
@@ -223,6 +224,26 @@ const CatalogResults = ({ catalog }) => {
 	)
 }
 
+/** A shared Deezer or Spotify link, opened through the song service. Tapping a song plays it; an album opens. */
+const LinkResult = ({ link }) => {
+	const { t } = useTranslation()
+	const theme = useTheme()
+	const message = (text) => (
+		<Text style={{ marginHorizontal: size.margin, color: theme.secondaryText, fontSize: size.text.medium }}>{text}</Text>
+	)
+
+	return (
+		<>
+			<Text style={[mainStyles.titleSection(theme), { fontSize: size.text.large, marginTop: 10, marginBottom: 3 }]}>{t(link.album ? 'songService.Shared album' : 'songService.Shared song')}</Text>
+			{link.state === 'unconfigured' && message(t('songService.Link needs service'))}
+			{link.state === 'loading' && <ActivityIndicator color={theme.primaryTouch} />}
+			{link.state === 'error' && message(link.error)}
+			{link.state === 'loaded' && link.track && <RequestSongsList items={[link.track]} />}
+			{link.state === 'loaded' && link.album && <RequestAlbumsList albums={[link.album]} />}
+		</>
+	)
+}
+
 const Search = () => {
 	const { t } = useTranslation()
 	const insets = useSafeAreaInsets()
@@ -236,6 +257,7 @@ const Search = () => {
 	const timeout = React.useRef(null)
 	const [catalog, setCatalog] = React.useState({ state: 'idle', items: [] })
 	const catalogRequest = React.useRef(0)
+	const [link, setLink] = React.useState({ state: 'idle' })
 
 	React.useEffect(() => {
 		if (history.length) return
@@ -288,7 +310,30 @@ const Search = () => {
 			})
 	}
 
+	// A pasted Deezer or Spotify link opens that song or album instead of searching for the link's text.
+	const openLink = () => {
+		catalogRequest.current++
+		setCatalog({ state: 'idle', items: [] })
+		setResults(undefined)
+		setState(STATES.LINK)
+		if (!isServiceConfigured(settings)) {
+			setLink({ state: 'unconfigured' })
+			return
+		}
+		const id = catalogRequest.current
+		setLink({ state: 'loading' })
+		resolveLink(settings, query)
+			.then((json) => {
+				if (id === catalogRequest.current) setLink({ state: 'loaded', track: json.track, album: json.album })
+			})
+			.catch((error) => {
+				if (id === catalogRequest.current) setLink({ state: 'error', error: error.message })
+			})
+	}
+
 	const getSearch = () => {
+		if (looksLikeSongLink(query)) return openLink()
+		setLink({ state: 'idle' })
 		getCatalog()
 		setState(STATES.LOADING)
 		getApiNetworkFirst(config, 'search3', { query })
@@ -335,7 +380,7 @@ const Search = () => {
 				{
 					query.length ?
 						<Pressable
-							onPress={() => { addHistory(query); setQuery(''); setResults(undefined); catalogRequest.current++; setCatalog({ state: 'idle', items: [] }) }}
+							onPress={() => { if (!looksLikeSongLink(query)) addHistory(query); setQuery(''); setResults(undefined); catalogRequest.current++; setCatalog({ state: 'idle', items: [] }) }}
 							style={({ pressed }) => ([mainStyles.opacity({ pressed }), { justifyContent: 'center' }])}>
 							<Text style={{ color: theme.primaryText, fontWeight: 'bold' }}>{t('Clear')}</Text>
 						</Pressable> : null
@@ -353,7 +398,8 @@ const Search = () => {
 					addHistory={addHistory}
 					onRetry={getSearch}
 				/>
-				{query.length > 0 && state !== STATES.INIT && <CatalogResults catalog={catalog} />}
+				{query.length > 0 && state === STATES.LINK && <LinkResult link={link} />}
+				{query.length > 0 && state !== STATES.INIT && state !== STATES.LINK && <CatalogResults catalog={catalog} />}
 			</ScrollView>
 		</View>
 	)
@@ -396,4 +442,4 @@ const styles = StyleSheet.create({
 	},
 })
 
-export default Search
+export default Search

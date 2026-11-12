@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, Share } from 'react-native'
+import { Platform } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 
@@ -11,7 +11,9 @@ import { playSong, addToQueue } from '~/utils/player'
 import { useSettings } from '~/contexts/settings'
 import { useSong, useSongDispatch } from '~/contexts/song'
 import { urlCover } from '~/utils/url'
+import { shareText } from '~/utils/tools'
 import OptionsPopup from '~/components/popup/OptionsPopup'
+import useShareLinks from '~/utils/useShareLinks'
 import size from '~/styles/size'
 
 const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () => { }, idPlaylist = null }) => {
@@ -23,6 +25,7 @@ const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () 
 	const settings = useSettings()
 	const refOption = React.useRef()
 	const [isCached, setIsCached] = React.useState(false)
+	const songLinks = useShareLinks(refOption)
 
 	React.useEffect(() => {
 		if (indexOptions < 0) return
@@ -148,10 +151,7 @@ const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () 
 	const shareSong = () => {
 		getApi(config, 'createShare', { id: songs[indexOptions].id })
 			.then((json) => {
-				if (json.shares.share.length > 0) {
-					if (Platform.OS === 'web') navigator.clipboard.writeText(json.shares.share[0].url)
-					else Share.share({ message: json.shares.share[0].url })
-				}
+				if (json.shares.share.length > 0) shareText(json.shares.share[0].url)
 			})
 			.catch(() => { })
 		refOption.current.close()
@@ -176,6 +176,7 @@ const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () 
 			ref={refOption}
 			visible={indexOptions >= 0}
 			close={() => {
+				songLinks.cancel()
 				refOption.current.clearVirtualOptions()
 				setIndexOptions(-1)
 			}}
@@ -233,6 +234,12 @@ const OptionsSongsList = ({ songs, indexOptions, setIndexOptions, onUpdate = () 
 					name: t('Share'),
 					icon: 'share',
 					onPress: shareSong
+				},
+				{
+					name: t('songService.Share song links'),
+					icon: 'share',
+					onPress: () => songLinks.shareSong(songs[indexOptions]),
+					hidden: !songLinks.available
 				},
 				{
 					name: t('Info'),

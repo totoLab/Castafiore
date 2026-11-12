@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, ScrollView, Platform, Share } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 
@@ -7,6 +7,7 @@ import { useConfig } from '~/contexts/config'
 import { confirmAlert } from '~/utils/alert'
 import { useTheme } from '~/contexts/theme'
 import { useCachedAndApi, getApi } from '~/utils/api'
+import { shareText } from '~/utils/tools'
 import ButtonText from '~/components/settings/ButtonText'
 import Header from '~/components/Header'
 import mainStyles from '~/styles/main'
@@ -96,8 +97,7 @@ const SharesSettings = () => {
 						name: t('Share'),
 						icon: 'share',
 						onPress: () => {
-							if (Platform.OS === 'web') navigator.clipboard.writeText(shares[indexOptions].url)
-							else Share.share({ message: shares[indexOptions].url })
+							shareText(shares[indexOptions].url)
 							refOption.current.close()
 						}
 					},
