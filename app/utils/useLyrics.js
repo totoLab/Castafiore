@@ -47,6 +47,20 @@ const fromLrcLib = async (song) => {
 	return synced.length ? synced : parsePlain(json.plainLyrics)
 }
 
+// Looser than fromLrcLib: matches on title and artist only, so a different album or duration still finds them.
+const searchLrcLib = async (song) => {
+	const query = `track_name=${encodeURIComponent(song.title)}&artist_name=${encodeURIComponent(song.artist || '')}`
+	const res = await fetch('https://lrclib.net/api/search?' + query, {
+		headers: { 'Lrclib-Client': 'Castafiore' }
+	})
+	if (!res.ok) return []
+	const results = await res.json()
+	const hit = results.find((r) => r.syncedLyrics) || results.find((r) => r.plainLyrics)
+	if (!hit) return []
+	const synced = parseLrc(hit.syncedLyrics)
+	return synced.length ? synced : parsePlain(hit.plainLyrics)
+}
+
 const fetchLyrics = async (config, song) => {
 	const saved = await AsyncStorage.getItem(`lyrics/${song.id}`).catch(() => null)
 	if (saved) {
@@ -108,9 +122,21 @@ const useLyrics = (song) => {
 		return () => { active = false }
 	}, [key])
 
+	// Runs a looser LRCLIB search; found lyrics are saved like any others.
+	const search = async () => {
+		if (!key) return
+		setState({ key, status: 'loading', lyrics: [] })
+		const lyrics = await searchLrcLib(song).catch(() => [])
+		if (lyrics.length) {
+			AsyncStorage.setItem(`lyrics/${song.id}`, JSON.stringify(lyrics)).catch(() => { })
+			memory.set(key, { promise: Promise.resolve(lyrics), lyrics })
+		}
+		setState((s) => (s.key === key ? stateOf(key, lyrics) : s))
+	}
+
 	// Until the effect runs for a new song, the previous song's lyrics must not show.
-	if (state.key !== key) return { status: 'loading', lyrics: [] }
-	return state
+	if (state.key !== key) return { status: 'loading', lyrics: [], search }
+	return { ...state, search }
 }
 
 export default useLyrics

@@ -17,7 +17,7 @@ const Lyric = ({ song, style, color = null, sizeText = 23, onShareLine = null })
 	const refScroll = React.useRef(null)
 	const theme = useTheme()
 	const time = Player.updateTime()
-	const { status, lyrics: found } = useLyrics(song.songInfo)
+	const { status, lyrics: found, search } = useLyrics(song.songInfo)
 	const synced = isSynced(found)
 
 	const lyrics = React.useMemo(() => {
@@ -55,6 +55,15 @@ const Lyric = ({ song, style, color = null, sizeText = 23, onShareLine = null })
 			data={lyrics}
 			onLayout={() => setIsLayout(true)}
 			keyExtractor={(item, index) => index}
+			ListFooterComponent={status === 'none' ? (
+				<Pressable
+					onPress={search}
+					accessibilityRole="button"
+					style={{ alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 20, borderWidth: 1, borderColor: color?.active || theme.primaryText }}
+				>
+					<Text style={{ color: color?.active || theme.primaryText, fontSize: sizeText * 0.7 }}>{t('Search lyrics')}</Text>
+				</Pressable>
+			) : null}
 			renderItem={({ item, index }) => {
 				const canShare = onShareLine && status === 'found' && !isBlankLine(item.text)
 				return (
