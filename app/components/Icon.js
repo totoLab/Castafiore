@@ -1,11 +1,11 @@
 import React from 'react'
 import {
-	ArrowDown01, ArrowDownAZ, ArrowDownWideNarrow, ArrowUp, ArrowUp01,
+	AlignCenter, AlignLeft, ArrowDown01, ArrowDownAZ, ArrowDownWideNarrow, ArrowUp, ArrowUp01,
 	AudioLines, Bell, Bookmark, Cast, ChartColumn, Check, ChevronDown, ChevronLeft, ChevronRight,
 	Circle, CloudDownload, Code, Database, Download, Droplet, Ellipsis, ExternalLink, Eye, FileAudio,
 	FileText, FlaskConical, FolderOpen, Gauge, Globe, Heart, House, IndentIncrease, Info, Languages,
 	Library, Link, List, Lock, Maximize2, Menu, MessageSquare, Monitor, Music, Pause, Pencil, Play,
-	Plus, RefreshCw, Repeat, Rss, Search, Server, Settings, Share2, Shuffle, SkipBack, SkipForward,
+	Plus, Quote, RefreshCw, Repeat, Rss, Search, Server, Settings, Share2, Shuffle, SkipBack, SkipForward,
 	Smartphone, Star, Tag, Trash2, Trophy, Tv, TriangleAlert, Undo2, User, Users, Volume2, VolumeX, X,
 } from 'lucide-react-native'
 
@@ -13,6 +13,8 @@ import {
 // Names in `filled` draw the solid variant, like FontAwesome did.
 const icons = {
 	'align-center': AudioLines,
+	'text-center': AlignCenter,
+	'text-left': AlignLeft,
 	'angle-left': ChevronLeft,
 	'angle-right': ChevronRight,
 	'arrow-up': ArrowUp,
@@ -62,6 +64,7 @@ const icons = {
 	'pencil': Pencil,
 	'play': Play,
 	'plus': Plus,
+	'quote': Quote,
 	'random': Shuffle,
 	'refresh': RefreshCw,
 	'repeat': Repeat,

@@ -12,6 +12,7 @@ import FavoritedButton from '~/components/button/FavoritedButton'
 import IconButton from '~/components/button/IconButton'
 import ImageError from '~/components/ImageError'
 import Lyric from '~/components/player/Lyric'
+import ShareLyricsModal from '~/components/share/ShareLyricsModal'
 import mainStyles from '~/styles/main'
 import OptionsMultiArtists from '~/components/options/OptionsMultiArtists'
 import OptionsPlayer from '~/components/options/OptionsPlayer'
@@ -33,7 +34,7 @@ const preview = {
 	LYRICS: 2
 }
 
-const CoverItem = ({ isPreview, song, setFullScreen, stars }) => {
+const CoverItem = ({ isPreview, song, setFullScreen, stars, onShareLine }) => {
 	const scroll = React.useRef(null)
 	const config = useConfig()
 	const theme = useTheme()
@@ -100,7 +101,7 @@ const CoverItem = ({ isPreview, song, setFullScreen, stars }) => {
 		</>
 	)
 	if (isPreview === preview.LYRICS) return (
-		<Lyric song={song} style={albumImage} />
+		<Lyric song={song} style={albumImage} onShareLine={onShareLine} />
 	)
 }
 
@@ -197,6 +198,8 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 	})).current
 	const [isOptArtists, setIsOptArtists] = React.useState(false)
 	const [isOpt, setIsOpt] = React.useState(false)
+	// The share-lyrics screen, open when set: `index` is the lyric line to start with, or null.
+	const [shareLyrics, setShareLyrics] = React.useState(null)
 
 	const [stars] = useCachedFirst([], 'getStarred2', null, (json, setData) => {
 		setData(json?.starred2?.song || [])
@@ -217,6 +220,13 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 						isOpen={isOpt}
 						setIsOpen={setIsOpt}
 						closePlayer={() => setFullScreen(false)}
+						onShareLyrics={() => setShareLyrics({ index: null })}
+					/>
+					<ShareLyricsModal
+						song={song.songInfo}
+						visible={!!shareLyrics}
+						initialIndex={shareLyrics?.index ?? null}
+						onClose={() => setShareLyrics(null)}
 					/>
 					<IconButton
 						style={{
@@ -243,7 +253,7 @@ const FullScreenPlayer = ({ setFullScreen }) => {
 					/>
 				</View>
 				<View style={styles.playerContainer}>
-					<CoverItem isPreview={isPreview} song={song} setFullScreen={setFullScreen} stars={stars} />
+					<CoverItem isPreview={isPreview} song={song} setFullScreen={setFullScreen} stars={stars} onShareLine={(index) => setShareLyrics({ index })} />
 					<View style={{ flexDirection: 'row', marginTop: 15, width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
 						<View style={{ flex: 1 }}>
 							<Pressable

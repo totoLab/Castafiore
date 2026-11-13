@@ -1,5 +1,37 @@
 {
   "translation": {
+    "shareLyrics": {
+      "Share lyrics": "Share lyrics",
+      "Long press hint": "Long press to share this line as an image",
+      "Style": "Style",
+      "Format": "Format",
+      "style": {
+        "glow": "Glow",
+        "block": "Block",
+        "polaroid": "Polaroid"
+      },
+      "format": {
+        "story": "Story",
+        "post": "Post",
+        "square": "Square"
+      },
+      "Colour": "Colour",
+      "Colour number": "Colour {{number}}",
+      "Centre text": "Centre the text",
+      "Align left": "Align the text left",
+      "Show mark": "Show the Castafiore mark",
+      "Hide mark": "Hide the Castafiore mark",
+      "Tap lines": "Tap lines to add them",
+      "Lines picked": "{{count}} of {{max}} lines",
+      "Too many lines": "{{max}} lines at most",
+      "Too long": "{{max}} characters at most",
+      "Share image": "Share image",
+      "Download image": "Download image",
+      "Making image": "Making the image…",
+      "Image downloaded": "Image downloaded.",
+      "Could not make the image": "Could not make the image. Try again.",
+      "No lyrics": "No lyrics found for this song, so there is nothing to share."
+    },
     "songService": {
       "Song service": "Song service",
       "Description": "Search shows songs from the full catalogue. Choosing one adds it to your server and plays it. The song service signs in with your server account. Leave the address empty to turn this off.",

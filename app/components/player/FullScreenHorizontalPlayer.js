@@ -12,6 +12,7 @@ import FavoritedButton from '~/components/button/FavoritedButton'
 import IconButton from '~/components/button/IconButton'
 import ImageError from '~/components/ImageError'
 import Lyric from '~/components/player/Lyric'
+import ShareLyricsModal from '~/components/share/ShareLyricsModal'
 import mainStyles from '~/styles/main'
 import OptionsQueue from '~/components/options/OptionsQueue'
 import PlayButton from '~/components/button/PlayButton'
@@ -69,6 +70,8 @@ const TimeBar = () => {
 const FullScreenHorizontalPlayer = ({ setFullScreen }) => {
 	const [isPreview, setIsPreview] = React.useState(preview.COVER)
 	const [indexOptions, setIndexOptions] = React.useState(-1)
+	// The share-lyrics screen, open when set: `index` is the lyric line to start with.
+	const [shareLyrics, setShareLyrics] = React.useState(null)
 	const config = useConfig()
 	const insets = useSafeAreaInsets()
 	const song = useSong()
@@ -114,6 +117,7 @@ const FullScreenHorizontalPlayer = ({ setFullScreen }) => {
 					<View style={{ flex: 2, alignItems: 'center' }}>
 						<Lyric
 							song={song}
+							onShareLine={(index) => setShareLyrics({ index })}
 							sizeText={30}
 							color={{
 								active: color.primary,
@@ -312,6 +316,12 @@ const FullScreenHorizontalPlayer = ({ setFullScreen }) => {
 					</View>
 				</View>
 			</View>
+			<ShareLyricsModal
+				song={song.songInfo}
+				visible={!!shareLyrics}
+				initialIndex={shareLyrics?.index ?? null}
+				onClose={() => setShareLyrics(null)}
+			/>
 		</Modal>
 	)
 }
