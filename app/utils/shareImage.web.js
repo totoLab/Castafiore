@@ -20,12 +20,20 @@ export const captureImage = async (ref, { width, height }) => {
 	return exact.toDataURL('image/png')
 }
 
+// A data URI as a Blob, without awaiting anything.
+const toBlob = (uri) => {
+	const [head, data] = uri.split(',')
+	const bytes = Uint8Array.from(atob(data), (char) => char.charCodeAt(0))
+	return new Blob([bytes], { type: head.slice(5).split(';')[0] })
+}
+
 /**
  * Shares a PNG (a data URI) with the browser's share sheet where it can share files,
  * otherwise downloads it. Resolves to 'shared', 'cancelled' or 'downloaded'.
+ * Browsers open the share sheet only straight after a tap, so nothing is awaited before `navigator.share`.
  */
 export const shareImage = async (uri, { title, fileName }) => {
-	const blob = await (await fetch(uri)).blob()
+	const blob = toBlob(uri)
 	const file = new File([blob], fileName, { type: 'image/png' })
 	if (navigator.canShare?.({ files: [file] })) {
 		try {

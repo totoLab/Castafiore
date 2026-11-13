@@ -11,7 +11,11 @@ import { parseLrc, parsePlain } from '~/utils/lrc'
  * Found lyrics are saved, so the player and the share screen load them once.
  */
 
+// Loads per server and song: `{ promise, lyrics }`, where `lyrics` is set once the promise resolves.
+// Shared by every useLyrics, so the player and the share screen fetch once. Songs with no lyrics are remembered too.
 const memory = new Map()
+const MEMORY_SIZE = 200
+const keyOf = (config, song) => `${config?.url}|${song.id}`
 
 const fromServer = async (config, song) => {
 	const res = await getApi(config, 'getLyricsBySongId', { id: song.id })
@@ -43,25 +47,39 @@ const fromLrcLib = async (song) => {
 	return synced.length ? synced : parsePlain(json.plainLyrics)
 }
 
-export const loadLyrics = async (config, song) => {
-	if (memory.has(song.id)) return memory.get(song.id)
+const fetchLyrics = async (config, song) => {
 	const saved = await AsyncStorage.getItem(`lyrics/${song.id}`).catch(() => null)
 	if (saved) {
 		try {
 			const lyrics = JSON.parse(saved)
-			if (Array.isArray(lyrics) && lyrics.length) {
-				memory.set(song.id, lyrics)
-				return lyrics
-			}
+			if (Array.isArray(lyrics) && lyrics.length) return lyrics
 		} catch { /* a broken saved copy is fetched again */ }
 	}
 	let lyrics = await fromServer(config, song).catch(() => [])
-	if (!lyrics.length) lyrics = await fromLrcLib(song).catch(() => [])
-	if (lyrics.length) {
-		memory.set(song.id, lyrics)
-		AsyncStorage.setItem(`lyrics/${song.id}`, JSON.stringify(lyrics)).catch(() => { })
+	if (!lyrics.length) {
+		// LRCLIB out of reach is not an answer, so the next try asks again.
+		lyrics = await fromLrcLib(song)
 	}
+	if (lyrics.length) AsyncStorage.setItem(`lyrics/${song.id}`, JSON.stringify(lyrics)).catch(() => { })
 	return lyrics
+}
+
+export const loadLyrics = (config, song) => {
+	const key = keyOf(config, song)
+	if (!memory.has(key)) {
+		// ponytail: oldest-first eviction, not LRU; fine at 200 songs.
+		if (memory.size >= MEMORY_SIZE) memory.delete(memory.keys().next().value)
+		const entry = {}
+		entry.promise = fetchLyrics(config, song).then(
+			(lyrics) => (entry.lyrics = lyrics),
+			() => {
+				memory.delete(key)
+				return []
+			},
+		)
+		memory.set(key, entry)
+	}
+	return memory.get(key).promise
 }
 
 /** True for lines with no words: gaps between verses, and the "..." placeholder shown for them. */
@@ -73,32 +91,25 @@ export const isSynced = (lyrics) => lyrics.length > 0 && lyrics.every((ly) => ty
 /** `{ status, lyrics }`, where status is 'loading', 'found' or 'none'. */
 const useLyrics = (song) => {
 	const config = useConfig()
-	const [state, setState] = React.useState(() => (
-		song?.id && memory.has(song.id)
-			? { id: song.id, status: 'found', lyrics: memory.get(song.id) }
-			: { id: song?.id, status: 'loading', lyrics: [] }
-	))
+	const key = song?.id ? keyOf(config, song) : null
+	const known = (k) => (k ? memory.get(k)?.lyrics : undefined)
+	const stateOf = (k, lyrics) => (lyrics
+		? { key: k, status: lyrics.length ? 'found' : 'none', lyrics }
+		: { key: k, status: 'loading', lyrics: [] })
+	const [state, setState] = React.useState(() => stateOf(key, known(key)))
 
 	React.useEffect(() => {
-		if (!song?.id) return
+		if (!key) return
 		let active = true
-		if (memory.has(song.id)) {
-			setState({ id: song.id, status: 'found', lyrics: memory.get(song.id) })
-			return
-		}
-		setState({ id: song.id, status: 'loading', lyrics: [] })
-		loadLyrics(config, song)
-			.then((lyrics) => {
-				if (active) setState({ id: song.id, status: lyrics.length ? 'found' : 'none', lyrics })
-			})
-			.catch(() => {
-				if (active) setState({ id: song.id, status: 'none', lyrics: [] })
-			})
+		setState(stateOf(key, known(key)))
+		loadLyrics(config, song).then((lyrics) => {
+			if (active) setState(stateOf(key, lyrics))
+		})
 		return () => { active = false }
-	}, [song?.id])
+	}, [key])
 
 	// Until the effect runs for a new song, the previous song's lyrics must not show.
-	if (state.id !== song?.id) return { status: 'loading', lyrics: [] }
+	if (state.key !== key) return { status: 'loading', lyrics: [] }
 	return state
 }
 

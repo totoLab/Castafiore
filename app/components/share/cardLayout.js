@@ -20,9 +20,9 @@ export const STYLES = ['glow', 'block', 'polaroid']
 
 // Lyric type, per style. `font` names a table in fontMetrics.
 export const TYPE = {
-	glow: { font: 'display', lineHeight: 1.14, gap: 0.12, min: 44 },
-	block: { font: 'block', lineHeight: 1.1, gap: 0.04, min: 56, upper: true },
-	polaroid: { font: 'typed', lineHeight: 1.38, gap: 0.15, min: 26 },
+	glow: { font: 'display', lineHeight: 1.14, gap: 0.12 },
+	block: { font: 'block', lineHeight: 1.1, gap: 0.04, upper: true },
+	polaroid: { font: 'typed', lineHeight: 1.38, gap: 0.15 },
 }
 
 // Fixed parts of each layout.
@@ -86,15 +86,18 @@ const rowCount = (font, text, size, maxWidth) => {
 	return rows
 }
 
-/** The largest font size, from `max` down to `min`, at which the lines fit in `width` x `height`. */
+// Smallest lyric size. Lines that need less than this would be cut off; MAX_LINES and MAX_CHARS keep them far from it.
+const MIN_SIZE = 12
+
+/** The largest font size, from `max` down, at which the lines fit in `width` x `height`. Smaller beats cut-off lines. */
 export const fitFontSize = ({ style, lines, width, height, max }) => {
 	const type = TYPE[style]
-	for (let size = max; size > type.min; size -= 2) {
+	for (let size = max; size > MIN_SIZE; size -= 2) {
 		const rows = lines.reduce((sum, line) => sum + rowCount(type.font, line, size, width), 0)
 		const total = rows * size * type.lineHeight + (lines.length - 1) * size * type.gap
 		if (total <= height) return size
 	}
-	return type.min
+	return MIN_SIZE
 }
 
 /** The box the lyrics have in each style, in image pixels. */

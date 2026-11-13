@@ -23,16 +23,27 @@ import useShareCover from '~/utils/shareCover'
 const PREFS_KEY = 'shareLyrics/prefs'
 const DEFAULT_PREFS = { style: 'glow', format: 'story', align: 'left', brand: true }
 
+// Saved prefs may come from another version of the app: keep only values this one knows.
+const checkPrefs = (saved) => ({
+	style: STYLES.includes(saved?.style) ? saved.style : DEFAULT_PREFS.style,
+	format: Object.keys(FORMATS).includes(saved?.format) ? saved.format : DEFAULT_PREFS.format,
+	align: ['left', 'center'].includes(saved?.align) ? saved.align : DEFAULT_PREFS.align,
+	brand: typeof saved?.brand === 'boolean' ? saved.brand : DEFAULT_PREFS.brand,
+})
+
+// How long the card's images may take to load before the share gives up.
+const IMAGE_TIMEOUT = 15000
+
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const canShareFiles = () => {
+const CAN_SHARE_FILES = (() => {
 	if (Platform.OS !== 'web') return true
 	try {
 		return !!navigator.canShare?.({ files: [new File([''], 'lyrics.png', { type: 'image/png' })] })
 	} catch {
 		return false
 	}
-}
+})()
 
 const fileName = (title) => `${(title || 'lyrics').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').toLowerCase() || 'lyrics'}-lyrics.png`
 
@@ -43,14 +54,22 @@ const nearestLine = (lyrics, index) => {
 	return -1
 }
 
-// Reads the playback position once, to start with the line being sung. Its own component so only it follows playback.
+// Picks the line being sung, to start with. Its own component so only it follows playback.
+// On native the position reads 0 until the first poll, so it waits for a position, or a moment if playback sits at 0.
 const PlaybackLine = ({ lyrics, onPick }) => {
-	const time = Player.updateTime()
+	const { position } = Player.updateTime()
+	const [waited, setWaited] = React.useState(false)
 	React.useEffect(() => {
-		const next = lyrics.findIndex((ly) => ly.time > time.position)
+		const timer = setTimeout(() => setWaited(true), 1500)
+		return () => clearTimeout(timer)
+	}, [])
+	const known = position > 0
+	React.useEffect(() => {
+		if (!known && !waited) return
+		const next = lyrics.findIndex((ly) => ly.time > position)
 		const index = next === -1 ? lyrics.length - 1 : Math.max(0, next - 1)
 		onPick(nearestLine(lyrics, index))
-	}, [])
+	}, [known, waited])
 	return null
 }
 
@@ -91,7 +110,9 @@ const ToolButton = ({ icon, label, active, onPress }) => {
 	)
 }
 
-const ShareLyrics = ({ song, initialIndex, onClose }) => {
+const ShareLyrics = ({ song: playing, initialIndex, onClose }) => {
+	// The song when the screen opened. The player may move on, but the picked lines belong to this one.
+	const [song] = React.useState(playing)
 	const { t } = useTranslation()
 	const theme = useTheme()
 	const config = useConfig()
@@ -109,6 +130,8 @@ const ShareLyrics = ({ song, initialIndex, onClose }) => {
 	const [limit, setLimit] = React.useState(null)
 	const [note, setNote] = React.useState(null)
 	const [busy, setBusy] = React.useState(false)
+	const [cardReady, setCardReady] = React.useState(false)
+	const [image, setImage] = React.useState(null)
 	const captureView = React.useRef(null)
 	const captureReady = React.useRef(false)
 	const listRef = React.useRef(null)
@@ -117,7 +140,7 @@ const ShareLyrics = ({ song, initialIndex, onClose }) => {
 
 	React.useEffect(() => {
 		AsyncStorage.getItem(PREFS_KEY)
-			.then((saved) => setPrefs({ ...DEFAULT_PREFS, ...(saved ? JSON.parse(saved) : {}) }))
+			.then((saved) => setPrefs(checkPrefs(saved ? JSON.parse(saved) : null)))
 			.catch(() => setPrefs(DEFAULT_PREFS))
 		return () => clearTimeout(limitTimer.current)
 	}, [])
@@ -200,15 +223,38 @@ const ShareLyrics = ({ song, initialIndex, onClose }) => {
 	// Drawn at 1080 device pixels wide, so the capture needs no scaling.
 	const captureWidth = CARD_WIDTH / PixelRatio.get()
 
+	const makeImage = async () => {
+		const start = Date.now()
+		while (!captureReady.current) {
+			if (Date.now() - start > IMAGE_TIMEOUT) throw new Error('The card images did not load.')
+			await wait(100)
+		}
+		await wait(80) // lets the last layout reach the screen
+		return captureImage(captureView, { width: format.w, height: format.h })
+	}
+
+	// On web the image is made ahead of the tap: browsers open the share sheet only straight after one.
+	React.useEffect(() => {
+		setImage(null)
+		if (Platform.OS !== 'web' || !ready || !cardReady) return
+		let active = true
+		const timer = setTimeout(() => {
+			makeImage()
+				.then((uri) => { if (active) setImage(uri) })
+				.catch((error) => logger.error('shareLyrics', `${error}`)) // the tap tries again
+		}, 150)
+		return () => {
+			active = false
+			clearTimeout(timer)
+		}
+	}, [ready, cardReady, prefs, lines, color, coverState.cover, coverState.backdrop])
+
 	const share = async () => {
 		if (busy || !ready) return
 		setBusy(true)
 		setNote(null)
 		try {
-			const start = Date.now()
-			while (!captureReady.current && Date.now() - start < 4000) await wait(100)
-			await wait(80) // lets the last layout reach the screen
-			const uri = await captureImage(captureView, { width: format.w, height: format.h })
+			const uri = image || await makeImage()
 			const result = await shareImage(uri, { title: t('shareLyrics.Share lyrics'), fileName: fileName(song.title) })
 			if (result === 'downloaded') setNote(t('shareLyrics.Image downloaded'))
 		} catch (error) {
@@ -231,7 +277,10 @@ const ShareLyrics = ({ song, initialIndex, onClose }) => {
 			{/* The full-size card that gets captured. It sits under the screen, so only the preview shows. */}
 			{ready ? (
 				<View style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-					<LyricCard ref={captureView} {...cardProps} width={captureWidth} onReady={(isReady) => { captureReady.current = isReady }} />
+					<LyricCard ref={captureView} {...cardProps} width={captureWidth} onReady={(isReady) => {
+						captureReady.current = isReady
+						setCardReady(isReady)
+					}} />
 				</View>
 			) : null}
 
@@ -366,9 +415,9 @@ const ShareLyrics = ({ song, initialIndex, onClose }) => {
 						>
 							{busy
 								? <ActivityIndicator size="small" color={theme.innerTouch} />
-								: <Icon name={canShareFiles() ? 'share' : 'download'} size={18} color={theme.innerTouch} />}
+								: <Icon name={CAN_SHARE_FILES ? 'share' : 'download'} size={18} color={theme.innerTouch} />}
 							<Text style={{ color: theme.innerTouch, fontSize: size.text.medium, fontWeight: '600' }}>
-								{busy ? t('shareLyrics.Making image') : t(canShareFiles() ? 'shareLyrics.Share image' : 'shareLyrics.Download image')}
+								{busy ? t('shareLyrics.Making image') : t(CAN_SHARE_FILES ? 'shareLyrics.Share image' : 'shareLyrics.Download image')}
 							</Text>
 						</Pressable>
 					</View>

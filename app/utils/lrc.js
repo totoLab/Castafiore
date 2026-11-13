@@ -1,25 +1,18 @@
-const TIME = /\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\]/
+const TIME = /\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\]/g
 
+// Synced lyrics, sorted by time. A line with several times ("[00:12.00][01:30.00]Chorus") is repeated at each.
 export const parseLrc = (lrc) => {
 	if (!lrc) return []
-	const lines = lrc.split(/\r?\n/)
 	const lyrics = []
-	for (let i = 0; i < lines.length; i++) {
-		const line = lines[i]
-		const time = line.match(TIME)
-		if (time) {
-			const minutes = parseInt(time[1])
-			const seconds = parseInt(time[2])
+	for (const line of lrc.split(/\r?\n/)) {
+		const text = line.replace(TIME, '').trim()
+		for (const [, minutes, seconds, digits] of line.matchAll(TIME)) {
 			// "[00:12.3]", "[00:12.34]" and "[00:12.345]" are all used
-			const fraction = time[3] ? parseInt(time[3]) / 10 ** time[3].length : 0
-			const text = line.replace(new RegExp(TIME, 'g'), '').trim()
-			lyrics.push({
-				time: minutes * 60 + seconds + fraction,
-				text
-			})
+			const fraction = digits ? parseInt(digits) / 10 ** digits.length : 0
+			lyrics.push({ time: parseInt(minutes) * 60 + parseInt(seconds) + fraction, text })
 		}
 	}
-	return lyrics
+	return lyrics.sort((a, b) => a.time - b.time)
 }
 
 // Lyrics with no timing, one entry per line. `time` is null, so nothing follows playback.
