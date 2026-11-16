@@ -40,8 +40,8 @@ const plainLoginAuth = new Map()
  * The Authorization header for the current server login, `Subsonic <user>:<salt>:<token>`.
  * Token logins are reused as they are; plain-password logins are turned into a token.
  */
-const authorization = () => {
-	const query = global.config?.query
+const authorization = (config = global.config) => {
+	const query = config?.query
 	if (!query) throw new Error('Connect to your music server first. The song service signs in with that account.')
 	const params = parseQuery(query)
 	const user = params.u
@@ -60,9 +60,9 @@ const authorization = () => {
 	return `Subsonic ${encodeURIComponent(user)}:${salt}:${token}`
 }
 
-const request = async (settings, path, init = {}) => {
+const request = async (settings, path, init = {}, config = undefined) => {
 	const url = `${settings.songServiceUrl.trim().replace(/\/+$/, '')}${path}`
-	const auth = authorization()
+	const auth = authorization(config)
 	let res
 	try {
 		res = await fetch(url, {
@@ -170,3 +170,40 @@ export const getAlbumLinks = (settings, album) => {
 
 /** The message to share for an album: its title and artist, then a link per service. */
 export const albumShareText = (album, links) => songShareText({ title: album.name ?? album.title, artist: album.artist }, links)
+
+// --- Discovery (see moderato's DISCOVERY.md) ---
+
+/**
+ * Suggestions from what people play. Shelves of songs, each with a reason line; `cached` songs play at once,
+ * `shared` ones are in the server's shared library, which rotates.
+ * @returns {Promise<{ shelves: Array<{ id: string, title: string, items: Array }>, computedAt: number }>}
+ */
+export const getDiscover = (settings, refresh = false, config = undefined) =>
+	request(settings, `/v1/discover${refresh ? '?refresh=1' : ''}`, {}, config)
+
+/** What the whole server has been playing: top artists and songs. */
+export const getActivity = (settings, days = 7, config = undefined) =>
+	request(settings, `/v1/discover/activity?days=${days}`, {}, config)
+
+// 204 has no body to parse.
+const sendNoContent = async (settings, path, method, body) => {
+	const url = `${settings.songServiceUrl.trim().replace(/\/+$/, '')}${path}`
+	const res = await fetch(url, {
+		method,
+		headers: { Authorization: authorization(), 'Content-Type': 'application/json' },
+		body: JSON.stringify(body),
+	})
+	if (!res.ok && res.status !== 404) throw new Error(`The song service returned HTTP ${res.status}.`)
+	return res.ok
+}
+
+/** Stop suggesting a song (`{ trackId }`) or an artist (`{ artist }`). */
+export const hideSuggestion = (settings, what) => sendNoContent(settings, '/v1/discover/hide', 'POST', what)
+export const unhideSuggestion = (settings, what) => sendNoContent(settings, '/v1/discover/hide', 'DELETE', what)
+
+/**
+ * Tell the service a song was starred or un-starred, so a song in the shared library stays while it is starred.
+ * Songs that are not shared answer 404, which is fine: this resolves to false and nothing else happens.
+ */
+export const setSharedStar = (settings, subsonicId, starred) =>
+	sendNoContent(settings, '/v1/discover/pin', starred ? 'POST' : 'DELETE', { subsonicId })

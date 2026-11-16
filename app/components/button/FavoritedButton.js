@@ -2,9 +2,11 @@ import React from 'react'
 
 import { useSetUpdateApi } from '~/contexts/updateApi'
 import { useConfig } from '~/contexts/config'
+import { useSettings } from '~/contexts/settings'
 import { useSongDispatch } from '~/contexts/song'
 import { useTheme } from '~/contexts/theme'
 import { getApi, refreshApi } from '~/utils/api'
+import { isServiceConfigured, setSharedStar } from '~/utils/songService'
 import IconButton from '~/components/button/IconButton'
 import RatingPopup from '~/components/popup/RatingPopup'
 import logger from '~/utils/logger'
@@ -15,6 +17,7 @@ const FavoritedButton = ({ id, isFavorited = false, rating: initialRating = unde
 	const [isRatingOpen, setIsRatingOpen] = React.useState(false)
 	const theme = useTheme()
 	const config = useConfig()
+	const settings = useSettings()
 	const songDispatch = useSongDispatch()
 	const setUpdateApi = useSetUpdateApi()
 
@@ -27,6 +30,9 @@ const FavoritedButton = ({ id, isFavorited = false, rating: initialRating = unde
 		getApi(config, favorited ? 'unstar' : 'star', { id, albumId: id, artistId: id })
 			.then(() => {
 				setFavorited(!favorited)
+				// A starred song in the song service's shared library stays there, for as long as it is starred.
+				// Anything else (albums, artists, songs of your own) is answered "not shared" and ignored.
+				if (isServiceConfigured(settings)) setSharedStar(settings, id, !favorited).catch(() => { })
 				refreshApi(config, 'getStarred2', null)
 					.then(() => {
 						setUpdateApi({ path: 'getStarred2', query: null, uid: 1 })

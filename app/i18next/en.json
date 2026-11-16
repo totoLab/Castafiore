@@ -75,7 +75,8 @@
         "scanning": "Adding to your library",
         "done": "Ready",
         "failed": "Could not add this song"
-      }
+      },
+      "Keep title": "Keep {{title}} in your library"
     },
     "tabs": {
       "Home": "Home",
@@ -95,7 +96,8 @@
       "Most Played": "Most Played",
       "Recently Played": "Recently Played",
       "Random": "Random",
-      "Highest": "Highest"
+      "Highest": "Highest",
+      "Discover": "Discover"
     },
     "settings": {
       "connect": {
@@ -286,6 +288,14 @@
     "No UPNP/DLNA devices found": "No UPNP/DLNA devices found",
     "Error scanning for devices": "Error scanning for devices",
     "Stream music to compatible devices: Chromecast, UPNP/DLNA speakers, TVs, and media receivers.": "Stream music to compatible devices: Chromecast, UPNP/DLNA speakers, TVs, and media receivers.",
-    "Chromecast": "Chromecast"
+    "Chromecast": "Chromecast",
+    "discover": {
+      "Discover": "Discover",
+      "Nothing yet": "No suggestions yet. They appear as people on your server play music.",
+      "Most played this week": "Most played this week",
+      "Keep in my library": "Keep in my library",
+      "Not interested in title": "Not interested in {{title}}",
+      "Hide artist": "Stop suggesting {{artist}}"
+    }
   }
 }

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import Icon from '~/components/Icon'
 
 import { getCachedAndApi, getUrl } from '~/utils/api'
+import { getDiscover, isServiceConfigured } from '~/utils/songService'
 import { getJsonCache } from '~/utils/cache'
 import { useTheme } from '~/contexts/theme'
 import { useSettings, homeSections } from '~/contexts/settings'
@@ -13,6 +14,7 @@ import { useUpdateApi, isUpdatable } from '~/contexts/updateApi'
 import { SkeletonRow } from '~/components/Skeleton'
 import HorizontalQueue from '~/components/lists/HorizontalQueue'
 import HorizontalAlbums from '~/components/lists/HorizontalAlbums'
+import HorizontalDiscover from '~/components/lists/HorizontalDiscover'
 import HorizontalArtists from '~/components/lists/HorizontalArtists'
 import HorizontalGenres from '~/components/lists/HorizontalGenres'
 import HorizontalLBStat from '~/components/lists/HorizontalLBStat'
@@ -47,7 +49,7 @@ const HorizontalList = ({ refresh, id, enable }) => {
 		if (!enable) return
 		if (!refresh) return
 		if (config.query) {
-			getList()
+			getList(true)
 		}
 	}, [refresh])
 
@@ -74,10 +76,25 @@ const HorizontalList = ({ refresh, id, enable }) => {
 		}
 	}, [updateApi])
 
-	const getList = async () => {
+	const getList = async (forceRefresh = false) => {
 		let nquery = section.query ? section.query : ''
 
 		if (section.type == 'album') nquery += '&size=' + settings.sizeOfList
+		if (section.type == 'discover') {
+			// Only the first shelf with songs; the rest is on the Discover screen.
+			if (!isServiceConfigured(settings)) return setList([])
+			// Home loads while the login is being set up: use the one this component already has, not the global.
+			getDiscover(settings, forceRefresh, config)
+				.then((json) => {
+					const shelf = json.shelves.find((s) => s.items.length > 0)
+					setList(shelf ? { title: shelf.title, items: shelf.items } : [])
+				})
+				.catch((error) => {
+					logger.error('Discover', error.message)
+					setList([])
+				})
+			return
+		}
 		if (section.type == 'listenbrainz') {
 			if (!settings.listenBrainzUser) return setList('No ListenBrainz user set')
 			fetch(`https://api.listenbrainz.org/1/stats/user/${encodeURIComponent(settings.listenBrainzUser)}/listening-activity?range=this_week`, { mode: 'cors' })
@@ -115,7 +132,7 @@ const HorizontalList = ({ refresh, id, enable }) => {
 					width: '100%',
 				}}
 				disabled={!section.isShowAll}
-				onPress={() => { navigation.navigate('ShowAll', { section }) }}
+				onPress={() => { section.type === 'discover' ? navigation.navigate('Discover') : navigation.navigate('ShowAll', { section }) }}
 			>
 				<Text numberOfLines={1} style={[mainStyles.titleSection(theme), {
 					flex: 1,
@@ -124,7 +141,7 @@ const HorizontalList = ({ refresh, id, enable }) => {
 					letterSpacing: -1.2,
 					marginTop: 15,
 					marginBottom: 8,
-				}]}>{t(`homeSection.${section.title}`)}</Text>
+				}]}>{section.type === 'discover' ? list.title : t(`homeSection.${section.title}`)}</Text>
 				{
 					section.isShowAll && <Icon
 						name='angle-right'
@@ -143,6 +160,7 @@ const HorizontalList = ({ refresh, id, enable }) => {
 			{section.type === 'radio' && <RadioList radios={list} />}
 			{section.type === 'listenbrainz' && <HorizontalLBStat stats={list} />}
 			{section.type === 'playlist' && <HorizontalPlaylists playlists={list} />}
+			{section.type === 'discover' && <HorizontalDiscover items={list.items} />}
 		</>
 	)
 }

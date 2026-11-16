@@ -22,6 +22,7 @@ import UpdateRadio from '~/screens/UpdateRadio'
 import AlbumExplorer from '~/screens/Explorer/AlbumExplorer'
 import ArtistExplorer from '~/screens/Explorer/ArtistExplorer'
 import SongExplorer from '~/screens/Explorer/SongExplorer'
+import Discover from '~/screens/Discover'
 import FreshReleases from '~/screens/FreshReleases'
 import Info from '~/screens/Info'
 import ShowAll from '~/screens/ShowAll'
@@ -50,6 +51,7 @@ export const HomeStack = () => {
 			<Stack.Screen name="Home" component={Home} />
 			<Stack.Screen name="ShowAll" component={ShowAll} />
 			<Stack.Screen name="FreshReleases" component={FreshReleases} />
+			<Stack.Screen name="Discover" component={Discover} />
 			<Stack.Screen name="UpdateRadio" component={UpdateRadio} />
 			{/* Pres */}
 			<Stack.Screen name="Album" component={Album} />
@@ -126,4 +128,4 @@ export const SettingsStack = () => {
 			<Stack.Screen name="Settings/SongService" component={SongServiceSettings} />
 		</Stack.Navigator>
 	)
-}
+}

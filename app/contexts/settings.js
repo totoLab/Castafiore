@@ -78,6 +78,7 @@ export const defaultSettings = {
 	homeOrderV2: [
 		{ id: 'week-activity', enable: false },
 		{ id: 'last-queue', enable: false },
+		{ id: 'discover', enable: true },
 		{ id: 'favorited-artist', enable: true },
 		{ id: 'genre', enable: false },
 		{ id: 'radio', enable: false },
@@ -134,6 +135,16 @@ export const homeSections = [
 		path: 'getPlayQueue',
 		query: '',
 		getInfo: (json, setList) => setList(json?.playQueue),
+	},
+	{
+		icon: 'compass',
+		id: 'discover',
+		title: 'Discover',
+		type: 'discover',
+		isShowAll: true,
+		path: '',
+		query: '',
+		getInfo: () => { },
 	},
 	{
 		icon: 'user',
@@ -283,4 +294,4 @@ const updateGlobalSettings = async (settings) => {
 	React.useEffect(() => {
 		global.repeatQueue = settings.repeatQueue
 	}, [settings.repeatQueue])
-}
+}

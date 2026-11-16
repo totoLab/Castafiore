@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useConfig } from '~/contexts/config'
 import { getCachedAndApi } from '~/utils/api'
+import { isServiceConfigured } from '~/utils/songService'
 import { urlCover } from '~/utils/url'
 import ImageError from '~/components/ImageError'
 import { useSettings } from '~/contexts/settings'
@@ -61,6 +62,15 @@ const Home = () => {
 		>
 				<View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 16, marginHorizontal: size.margin, marginTop: 28 }}>
 					{
+						isServiceConfigured(settings) ?
+							<IconButton
+								icon="compass"
+								size={size.icon.header}
+								color={theme.primaryText}
+								onPress={() => navigation.navigate('Discover')}
+							/> : null
+					}
+					{
 						settings.listenBrainzUser ?
 							<IconButton
 								icon="bell-o"
@@ -111,4 +121,4 @@ const styles = StyleSheet.create({
 	}),
 })
 
-export default Home
+export default Home

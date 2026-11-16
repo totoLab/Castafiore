@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next'
 import Icon from '~/components/Icon'
 
 import { useConfig } from '~/contexts/config'
-import { useSettings } from '~/contexts/settings'
 import { useSongDispatch } from '~/contexts/song'
 import { useTheme } from '~/contexts/theme'
-import { getApi } from '~/utils/api'
 import { addToQueue, playSong } from '~/utils/player'
-import { fetchSong, JOB_STEPS } from '~/utils/songService'
+import { JOB_STEPS } from '~/utils/songService'
+import useSongRequests from '~/utils/useSongRequests'
 import ImageError from '~/components/ImageError'
 import mainStyles from '~/styles/main'
 import size from '~/styles/size'
@@ -43,41 +42,14 @@ const Progress = ({ state }) => {
  * the library if needed and plays it as soon as Navidrome has it; the download button
  * only adds it.
  */
-const RequestSongsList = ({ items, isIndex = false, getAllRef = null }) => {
+const RequestSongsList = ({ items, isIndex = false, getAllRef = null, showReason = false, onLongPress = null, requests = null }) => {
 	const { t } = useTranslation()
 	const theme = useTheme()
 	const config = useConfig()
-	const settings = useSettings()
 	const songDispatch = useSongDispatch()
-	const [jobs, setJobs] = React.useState({})
-	// Only the most recent tap starts playback, so an earlier request that finishes late does not interrupt.
-	const latest = React.useRef(null)
-
-	const setJob = (id, value) => setJobs((prev) => ({ ...prev, [id]: value }))
-
-	const getSong = (subsonicId) =>
-		getApi(config, 'getSong', { id: subsonicId }).then((json) => json?.song).catch(() => null)
-
-	const play = async (subsonicId) => {
-		const song = await getSong(subsonicId)
-		if (song) playSong(config, songDispatch, [song], 0)
-	}
-
-	/** Resolves with the song's Subsonic id once it is in the library, or null if it could not be added. */
-	const ensure = async (item) => {
-		const current = jobs[item.id]
-		if (item.cached && item.subsonicId) return item.subsonicId
-		if (current?.subsonicId) return current.subsonicId
-		try {
-			setJob(item.id, { state: 'queued' })
-			const subsonicId = await fetchSong(settings, item.id, (job) => setJob(item.id, { state: job.state }))
-			setJob(item.id, { state: 'done', subsonicId })
-			return subsonicId
-		} catch (error) {
-			setJob(item.id, { error: error?.message ?? t('songService.job.failed') })
-			return null
-		}
-	}
+	// A screen with several lists can pass one set of requests, so a song kept from a menu shows as kept in its row.
+	const own = useSongRequests()
+	const { jobs, latest, ensure, getSong, playItem } = requests ?? own
 
 	/**
 	 * Add every song. With `play`, also play them in list order: the first one starts as
@@ -85,7 +57,7 @@ const RequestSongsList = ({ items, isIndex = false, getAllRef = null }) => {
 	 * one at a time.
 	 */
 	const getAll = async ({ play = true } = {}) => {
-		const pending = items.map(ensure)
+		const pending = items.map((item) => ensure(item))
 		if (!play) return
 		const token = {}
 		latest.current = token
@@ -102,18 +74,12 @@ const RequestSongsList = ({ items, isIndex = false, getAllRef = null }) => {
 	}
 	if (getAllRef) getAllRef.current = getAll
 
-	const onPress = async (item) => {
-		const current = jobs[item.id]
-		if (current && !current.error && current.state !== 'done') return
-		latest.current = item.id
-		const subsonicId = await ensure(item)
-		if (subsonicId && latest.current === item.id) await play(subsonicId)
-	}
+	const onPress = (item) => playItem(item)
 
-	const add = (item) => {
+	const add = (item, options) => {
 		const current = jobs[item.id]
 		if (current && !current.error) return
-		ensure(item)
+		ensure(item, options)
 	}
 
 	return (
@@ -122,12 +88,15 @@ const RequestSongsList = ({ items, isIndex = false, getAllRef = null }) => {
 				const job = jobs[item.id]
 				const inLibrary = item.cached || job?.state === 'done'
 				const busy = job && !job.error && job.state !== 'done'
+				// In the shared library, which rotates, until the user keeps it.
+				const onlyShared = item.shared && job?.state !== 'done'
 
 				return (
 					<Pressable
 						key={item.id}
 						style={({ pressed }) => ([mainStyles.opacity({ pressed }), styles.row])}
-						onPress={() => onPress(job?.subsonicId ? { ...item, cached: true, subsonicId: job.subsonicId } : item)}
+						onPress={() => onPress(job?.subsonicId ? { ...item, cached: true, shared: false, subsonicId: job.subsonicId } : item)}
+						onLongPress={onLongPress ? () => onLongPress(item) : undefined}
 						disabled={busy}
 						accessibilityLabel={inLibrary ? t('songService.Play title', { title: item.title }) : t('songService.Get and play title', { title: item.title })}
 					>
@@ -143,11 +112,24 @@ const RequestSongsList = ({ items, isIndex = false, getAllRef = null }) => {
 									? job.error
 									: busy
 										? t(`songService.job.${job.state}`)
-										: [item.artist, item.album, duration(item.durationMs)].filter(Boolean).join(' · ')}
+										: (showReason && item.reason
+											? [item.artist, item.reason]
+											: [item.artist, item.album, duration(item.durationMs)]
+										).filter(Boolean).join(' · ')}
 							</Text>
 							{busy && <Progress state={job.state} />}
 						</View>
-						{inLibrary || busy ? (
+						{onlyShared && !busy ? (
+							<Pressable
+								onPress={() => add(item, { keep: true })}
+								hitSlop={10}
+								style={({ pressed }) => ([mainStyles.opacity({ pressed }), styles.action])}
+								accessibilityRole="button"
+								accessibilityLabel={t('songService.Keep title', { title: item.title })}
+							>
+								<Icon name="bookmark" size={size.icon.tiny} color={theme.secondaryText} />
+							</Pressable>
+						) : inLibrary || busy ? (
 							<Icon
 								name={inLibrary ? 'check' : 'hourglass-half'}
 								size={size.icon.tiny}
