@@ -18,7 +18,8 @@
       "Most Played": "よく聞く曲",
       "Recently Played": "最近再生",
       "Random": "ランダム",
-      "Highest": "高評価"
+      "Highest": "高評価",
+      "Discover": "見つける"
     },
     "settings": {
       "connect": {
@@ -205,6 +206,17 @@
     "No UPNP/DLNA devices found": "UPNP/DLNAデバイスが見つかりません",
     "Error scanning for devices": "デバイスのスキャンエラー",
     "Stream music to compatible devices: Chromecast, UPNP/DLNA speakers, TVs, and media receivers.": "対応デバイスに音楽をストリーミング: Chromecast、UPNP/DLNAスピーカー、テレビ、メディアレシーバー。",
-    "Chromecast": "Chromecast"
+    "Chromecast": "Chromecast",
+    "songService": {
+      "Keep title": "{{title}}をライブラリに保存"
+    },
+    "discover": {
+      "Discover": "見つける",
+      "Nothing yet": "まだおすすめはありません。サーバーの誰かが音楽を再生すると表示されます。",
+      "Most played this week": "今週よく再生された曲",
+      "Keep in my library": "マイライブラリに保存",
+      "Not interested in title": "{{title}}に興味がない",
+      "Hide artist": "{{artist}}をおすすめしない"
+    }
   }
 }

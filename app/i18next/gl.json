@@ -17,7 +17,8 @@
       "Most Played": "Máis reproducidos",
       "Recently Played": "Reproducidos recentemente",
       "Random": "Aleatorio",
-      "Highest": "Máis alto"
+      "Highest": "Máis alto",
+      "Discover": "Descubrir"
     },
     "settings": {
       "connect": {
@@ -187,6 +188,17 @@
     "min": "min",
     "minutes": "minutos",
     "song": "canción",
-    "songs": "cancións"
+    "songs": "cancións",
+    "songService": {
+      "Keep title": "Gardar {{title}} na túa biblioteca"
+    },
+    "discover": {
+      "Discover": "Descubrir",
+      "Nothing yet": "Aínda non hai suxestións. Aparecen cando a xente do teu servidor escoita música.",
+      "Most played this week": "O máis escoitado esta semana",
+      "Keep in my library": "Gardar na miña biblioteca",
+      "Not interested in title": "Non me interesa {{title}}",
+      "Hide artist": "Deixar de suxerir {{artist}}"
+    }
   }
 }

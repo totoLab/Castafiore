@@ -17,7 +17,8 @@
       "Most Played": "Més escoltats",
       "Recently Played": "Escoltats recentment",
       "Random": "Aleatori",
-      "Highest": "Més alt"
+      "Highest": "Més alt",
+      "Discover": "Descobrir"
     },
     "settings": {
       "connect": {
@@ -187,6 +188,17 @@
     "min": "min",
     "minutes": "minuts",
     "song": "cançó",
-    "songs": "cançons"
+    "songs": "cançons",
+    "songService": {
+      "Keep title": "Guarda {{title}} a la teva biblioteca"
+    },
+    "discover": {
+      "Discover": "Descobrir",
+      "Nothing yet": "Encara no hi ha suggeriments. Apareixen quan la gent del teu servidor escolta música.",
+      "Most played this week": "Més escoltades aquesta setmana",
+      "Keep in my library": "Guarda-ho a la meva biblioteca",
+      "Not interested in title": "No m'interessa {{title}}",
+      "Hide artist": "Deixa de suggerir {{artist}}"
+    }
   }
 }

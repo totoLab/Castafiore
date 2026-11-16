@@ -18,7 +18,8 @@
       "Most Played": "Más reproducidos",
       "Recently Played": "Reproducidos recientemente",
       "Random": "Aleatorio",
-      "Highest": "Más valorados"
+      "Highest": "Más valorados",
+      "Discover": "Descubrir"
     },
     "settings": {
       "connect": {
@@ -205,6 +206,17 @@
     "No UPNP/DLNA devices found": "No se encontraron dispositivos UPNP/DLNA",
     "Error scanning for devices": "Error al buscar dispositivos",
     "Stream music to compatible devices: Chromecast, UPNP/DLNA speakers, TVs, and media receivers.": "Transmite música a dispositivos compatibles: Chromecast, altavoces UPNP/DLNA, televisores y receptores multimedia.",
-    "Chromecast": "Chromecast"
+    "Chromecast": "Chromecast",
+    "songService": {
+      "Keep title": "Guardar {{title}} en tu biblioteca"
+    },
+    "discover": {
+      "Discover": "Descubrir",
+      "Nothing yet": "Aún no hay sugerencias. Aparecen cuando la gente de tu servidor escucha música.",
+      "Most played this week": "Lo más escuchado esta semana",
+      "Keep in my library": "Guardar en mi biblioteca",
+      "Not interested in title": "No me interesa {{title}}",
+      "Hide artist": "Dejar de sugerir a {{artist}}"
+    }
   }
 }

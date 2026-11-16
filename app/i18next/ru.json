@@ -17,7 +17,8 @@
       "Most Played": "На репите",
       "Recently Played": "Недавно слушали",
       "Random": "Случайные",
-      "Highest": "Популярные"
+      "Highest": "Популярные",
+      "Discover": "Открытия"
     },
     "settings": {
       "connect": {
@@ -187,6 +188,17 @@
     "min": "мин",
     "minutes": "минуты",
     "song": "трек",
-    "songs": "треки"
+    "songs": "треки",
+    "songService": {
+      "Keep title": "Сохранить «{{title}}» в вашей библиотеке"
+    },
+    "discover": {
+      "Discover": "Открытия",
+      "Nothing yet": "Пока нет рекомендаций. Они появятся, когда пользователи вашего сервера начнут слушать музыку.",
+      "Most played this week": "Самое популярное на этой неделе",
+      "Keep in my library": "Сохранить в мою библиотеку",
+      "Not interested in title": "Не интересует «{{title}}»",
+      "Hide artist": "Больше не предлагать {{artist}}"
+    }
   }
 }

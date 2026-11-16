@@ -18,7 +18,8 @@
       "Most Played": "가장 많이 재생됨",
       "Recently Played": "최근 재생됨",
       "Random": "랜덤",
-      "Highest": "높은 평가"
+      "Highest": "높은 평가",
+      "Discover": "발견"
     },
     "settings": {
       "connect": {
@@ -205,6 +206,17 @@
     "No UPNP/DLNA devices found": "UPNP/DLNA 장치가 검색되지 않음",
     "Error scanning for devices": "장치 검색 중 오류 발생",
     "Stream music to compatible devices: Chromecast, UPNP/DLNA speakers, TVs, and media receivers.": "스트리밍 호환 장치: 크롬캐스트, UPNP/DLNA 스피커, TV, 미디어 리시버.",
-    "Chromecast": "크롬캐스트"
+    "Chromecast": "크롬캐스트",
+    "songService": {
+      "Keep title": "{{title}}을(를) 라이브러리에 보관"
+    },
+    "discover": {
+      "Discover": "발견",
+      "Nothing yet": "아직 추천이 없습니다. 서버의 다른 사용자가 음악을 재생하면 나타납니다.",
+      "Most played this week": "이번 주 가장 많이 재생됨",
+      "Keep in my library": "내 라이브러리에 보관",
+      "Not interested in title": "{{title}}에 관심 없음",
+      "Hide artist": "{{artist}} 추천 중지"
+    }
   }
 }

@@ -17,7 +17,8 @@
       "Most Played": "Meist gespielt",
       "Recently Played": "Zuletzt gespielt",
       "Random": "Zufällig",
-      "Highest": "Höchstes"
+      "Highest": "Höchstes",
+      "Discover": "Entdecken"
     },
     "settings": {
       "connect": {
@@ -187,6 +188,17 @@
     "min": "Min",
     "minutes": "Minuten",
     "song": "Lied",
-    "songs": "Lieder"
+    "songs": "Lieder",
+    "songService": {
+      "Keep title": "{{title}} in deiner Bibliothek behalten"
+    },
+    "discover": {
+      "Discover": "Entdecken",
+      "Nothing yet": "Noch keine Vorschläge. Sie erscheinen, sobald Leute auf deinem Server Musik hören.",
+      "Most played this week": "Diese Woche am meisten gehört",
+      "Keep in my library": "In meiner Bibliothek behalten",
+      "Not interested in title": "Kein Interesse an {{title}}",
+      "Hide artist": "{{artist}} nicht mehr vorschlagen"
+    }
   }
 }

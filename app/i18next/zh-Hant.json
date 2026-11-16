@@ -17,7 +17,8 @@
       "Most Played": "最多播放",
       "Recently Played": "最近播放",
       "Random": "隨機",
-      "Highest": "最高評分"
+      "Highest": "最高評分",
+      "Discover": "發現"
     },
     "settings": {
       "connect": {
@@ -187,6 +188,17 @@
     "min": "分鐘",
     "minutes": "分鐘",
     "song": "歌曲",
-    "songs": "歌曲"
+    "songs": "歌曲",
+    "songService": {
+      "Keep title": "將《{{title}}》儲存到你的音樂庫"
+    },
+    "discover": {
+      "Discover": "發現",
+      "Nothing yet": "目前沒有推薦。當伺服器上的人播放音樂後，推薦就會出現。",
+      "Most played this week": "本週播放最多",
+      "Keep in my library": "儲存到我的音樂庫",
+      "Not interested in title": "對《{{title}}》不感興趣",
+      "Hide artist": "不再推薦 {{artist}}"
+    }
   }
 }

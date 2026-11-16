@@ -17,7 +17,8 @@
       "Most Played": "Più ascoltati",
       "Recently Played": "Ascoltati di recente",
       "Random": "Casuale",
-      "Highest": "Top brani"
+      "Highest": "Top brani",
+      "Discover": "Scopri"
     },
     "settings": {
       "connect": {
@@ -187,6 +188,17 @@
     "min": "min",
     "minutes": "minuti",
     "song": "brano",
-    "songs": "brani"
+    "songs": "brani",
+    "songService": {
+      "Keep title": "Tieni {{title}} nella tua libreria"
+    },
+    "discover": {
+      "Discover": "Scopri",
+      "Nothing yet": "Ancora nessun suggerimento. Compaiono quando le persone sul tuo server ascoltano musica.",
+      "Most played this week": "Più ascoltati questa settimana",
+      "Keep in my library": "Tieni nella mia libreria",
+      "Not interested in title": "Non mi interessa {{title}}",
+      "Hide artist": "Smetti di suggerire {{artist}}"
+    }
   }
 }
